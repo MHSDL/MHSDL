@@ -329,6 +329,51 @@ p.completions.sort((a,b)=>b.pointsEarned - a.pointsEarned).forEach(c => {
 list.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800/80 text-xs"> <div class="flex justify-between font-bold text-white mb-0.5"> <span>${c.levelName}</span> <span class="text-emerald-400 font-mono">+${c.pointsEarned.toFixed(0)}</span> </div> <span class="text-[10px] text-slate-500 uppercase font-medium">${c.tier} Position Rank #${c.rank}</span> </div>;
 });
 }
+
+    // ==========================================
+// 🧭 CORE NAVIGATION TAB SWITCHING ENGINES
+// ==========================================
+
+// Handles clicking the main top header menu buttons (Lists, Leaderboard, Mod Panel, etc.)
+function switchTab(tabId) {
+  // Update system tracking state
+  currentTab = tabId;
+  
+  // Hide all panel pages on the screen instantly
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  
+  // Find the exact tab page clicked and reveal it safely
+  const targetSection = document.getElementById(`section-${tabId}`);
+  if (targetSection) targetSection.classList.remove('hidden');
+  
+  // Reset all nav button aesthetics to grey inactive styles
+  document.querySelectorAll('#mainNavTabs button').forEach(b => {
+    b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all";
+  });
+  
+  // Highlight the clicked active button with a clear red focus badge
+  const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+  if (activeBtn) activeBtn.className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white transition-all";
+}
+
+// Handles clicking the level tier filters row (Pemonlist, Classic List, Legacy, Challenge)
+function switchSubList(subListId) {
+  // Update layout pointer state tracking variable
+  currentSubList = subListId;
+  
+  // Reset row sub-toggles styles cleanly to clear background layouts
+  document.querySelectorAll('#subListTabRow button').forEach(b => {
+    b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50 transition-all";
+  });
+  
+  // Highlight the target tier sub-button with an active border highlight focus card
+  const activeBtn = document.getElementById(`subListBtn-${subListId}`);
+  if (activeBtn) activeBtn.className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 transition-all";
+  
+  // Re-run filter maps query to dynamically display levels matching the target category choice
+  renderLevelList();
+}
+
 // Submission Actions
 async function handleRecordSubmit(e) {
 e.preventDefault();
