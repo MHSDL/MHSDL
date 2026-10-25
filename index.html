@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MHSDL</title>
-  <!-- Tailwind CSS Engine -->
+  <title>MHSDL - Demon List Matrix</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Icon Packs -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
@@ -14,321 +12,136 @@
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col custom-scrollbar">
 
-  <!-- Top Navigation Header -->
+  <!-- Header Nav -->
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-4 shadow-xl">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3 cursor-pointer select-none" onclick="switchTab('lists')">
         <div class="bg-red-600 text-white px-3 py-1.5 rounded-xl font-black text-xl tracking-wider shadow-lg shadow-red-900/40">MHSDL</div>
         <div>
-          <h1 class="font-bold text-lg leading-tight text-white">MHSDL</h1>
-          <p class="text-[11px] text-gray-400">AREDL Progressive Scaling</p>
+          <h1 class="font-bold text-lg text-white">Central Demon List</h1>
+          <p class="text-[11px] text-gray-400">GitHub Pages DatabasAe Active</p>
         </div>
       </div>
       
-      <!-- Global Realtime Search Bar -->
-      <div class="relative w-full md:w-80 lg:w-96">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+      <div class="relative w-full md:w-80">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
           <i class="fa-solid fa-magnifying-glass text-xs"></i>
         </span>
-        <input type="text" id="globalSearch" oninput="handleSearch(this.value)" placeholder="Filter levels, creators, players..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors">
+        <input type="text" id="globalSearch" oninput="handleSearch(this.value)" placeholder="Filter list entries..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500">
       </div>
 
-      <!-- Main Navigation Tab Links -->
       <nav class="flex items-center bg-slate-950 p-1 border border-slate-800 rounded-xl overflow-x-auto max-w-full custom-scrollbar">
-        <button onclick="switchTab('lists')" id="tabBtn-lists" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all bg-red-600 text-white">Lists</button>
-        <button onclick="switchTab('leaderboard')" id="tabBtn-leaderboard" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white">Leaderboard</button>
-        <button onclick="switchTab('events')" id="tabBtn-events" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white">Events</button>
-        <button onclick="switchTab('submit')" id="tabBtn-submit" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white">Submit Run</button>
-        <button onclick="switchTab('mod')" id="tabBtn-mod" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white border border-transparent hover:border-red-900/50"><i class="fa-solid fa-shield-halved text-xs mr-1.5 text-red-500"></i>Mod Panel</button>
+        <button onclick="switchTab('lists')" id="tabBtn-lists" class="px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white">Lists</button>
+        <button onclick="switchTab('leaderboard')" id="tabBtn-leaderboard" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white">Leaderboard</button>
+        <button onclick="switchTab('events')" id="tabBtn-events" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white">Events</button>
+        <button onclick="switchTab('submit')" id="tabBtn-submit" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white">Submit Run</button>
+        <button onclick="switchTab('mod')" id="tabBtn-mod" class="px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white"><i class="fa-solid fa-shield-halved text-xs mr-1 text-red-500"></i>Mod Panel</button>
       </nav>
     </div>
   </header>
 
-  <!-- Main View Workspace Architecture Container -->
+  <!-- Workspace Shell Content Framework Matrix Structure -->
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-    
-    <!-- LEFT & MIDDLE DATA COMPARTMENT -->
     <div class="lg:col-span-2 space-y-6">
       
-      <!-- SUBSECTION: LIST DIRECTORIES -->
+      <!-- List Tab Layout Section -->
       <section id="section-lists" class="tab-content">
-        <!-- Sub-list categories selector row -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 bg-slate-900/40 p-1.5 border border-slate-800 rounded-xl">
-          <button onclick="switchSubList('classic')" id="subListBtn-classic" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all bg-slate-800 text-white border border-slate-700">Classic List</button>
-          <button onclick="switchSubList('pemonlist')" id="subListBtn-pemonlist" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:bg-slate-800/50">Pemonlist</button>
-          <button onclick="switchSubList('legacy')" id="subListBtn-legacy" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:bg-slate-800/50">Legacy List</button>
-          <button onclick="switchSubList('challenge')" id="subListBtn-challenge" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:bg-slate-800/50">Challenge List</button>
+          <button onclick="switchSubList('pemonlist')" id="subListBtn-pemonlist" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700">Pemonlist</button>
+          <button onclick="switchSubList('classic')" id="subListBtn-classic" class="px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50">Classic List</button>
+          <button onclick="switchSubList('legacy')" id="subListBtn-legacy" class="px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50">Legacy List</button>
+          <button onclick="switchSubList('challenge')" id="subListBtn-challenge" class="px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50">Challenge List</button>
         </div>
-
-        <!-- Levels List Output Holder -->
         <div id="levelListContainer" class="space-y-3"></div>
       </section>
 
-      <!-- SUBSECTION: LEADERBOARDS -->
+      <!-- Leaderboard Tab Layout Section -->
       <section id="section-leaderboard" class="tab-content hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <div class="mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-trophy text-amber-500"></i> Global Player Leaderboard
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Calculated in real-time from verified tier points and completions.</p>
-          </div>
-          
-          <div class="overflow-x-auto custom-scrollbar">
-            <table class="w-full text-left text-sm">
-              <thead class="text-xs uppercase bg-slate-950 border border-slate-800 text-slate-400">
-                <tr>
-                  <th class="px-4 py-3 rounded-l-xl">Rank</th>
-                  <th class="px-4 py-3">Player Identity</th>
-                  <th class="px-4 py-3 text-right rounded-r-xl">Total Points</th>
-                </tr>
-              </thead>
-              <tbody id="leaderboardTableBody" class="divide-y divide-slate-800/50"></tbody>
-            </table>
-          </div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-amber-500"></i> Top Ranks</h2>
+          <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-xs uppercase bg-slate-950 text-slate-400"><tr><th class="px-4 py-3">Rank</th><th class="px-4 py-3">Player</th><th class="px-4 py-3 text-right">Points</th></tr></thead><tbody id="leaderboardTableBody" class="divide-y divide-slate-800/50"></tbody></table></div>
         </div>
       </section>
 
-      <!-- SUBSECTION: CHALLENGE AND LIST EVENTS -->
+      <!-- Events Tab Layout Section -->
       <section id="section-events" class="tab-content hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <div class="mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-calendar-check text-red-500"></i> Active List Operations & Events
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Active community challenges and seasonal milestones.</p>
-          </div>
-          
-          <div class="space-y-4" id="eventsContainer">
-            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">LIVE</span>
-                <h3 class="text-base font-bold text-white mt-1">MHSDL Global Launch Race</h3>
-                <p class="text-xs text-slate-400 mt-0.5">The first 3 verified victors on any tier placement claim profile honors.</p>
-              </div>
-              <div class="text-xs text-slate-500 whitespace-nowrap">Concludes: Nov 15, 2026</div>
-            </div>
-          </div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4"><i class="fa-solid fa-calendar-check text-red-500"></i> Active Operations</h2>
+          <p class="text-sm text-slate-400">Database synchronization verified. Changes made by list staff are saved centrally and sync across everyone's screen globally!</p>
         </div>
       </section>
 
-      <!-- SUBSECTION: USER PUBLIC RECORD SUBMISSIONS -->
+      <!-- Record Submission Layout Tab Section -->
       <section id="section-submit" class="tab-content hidden">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <div class="mb-6">
-            <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-share-from-square text-emerald-500"></i> Submit Verification Record
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Fill out player run properties for list panel verification.</p>
-          </div>
-          
+          <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-4"><i class="fa-solid fa-share-from-square text-emerald-500"></i> Submit Record</h2>
           <form id="recordSubmissionForm" onsubmit="handleRecordSubmit(event)" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Player Identifier</label>
-                <input type="text" id="submitPlayerName" required placeholder="e.g., Zoink" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Target Map Level</label>
-                <select id="submitTargetLevel" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500"></select>
-              </div>
+              <input type="text" id="submitPlayerName" required placeholder="Your Player Name" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100">
+              <select id="submitTargetLevel" class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100"></select>
             </div>
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Video Link Verification Proof</label>
-              <input type="url" id="submitVideoUrl" required placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-            </div>
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl py-3 tracking-wide shadow-lg transition-colors">Route to Mod Audit Queue</button>
+            <input type="url" id="submitVideoUrl" required placeholder="Completion Video Proof Link URL" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100">
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl py-3 text-sm">Submit Record</button>
           </form>
         </div>
       </section>
 
+      <!-- Mod Control Panel Layout Tab Section -->
       <section id="section-mod" class="tab-content hidden">
-        <div id="modAuthView" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center max-w-md mx-auto my-8">
-          <div class="bg-red-600/10 border border-red-500/20 text-red-500 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-xl mb-4">
-            <i class="fa-solid fa-lock bg-transparent"></i>
-          </div>
-          <h2 class="text-xl font-bold text-white mb-1">Staff Access Point</h2>
-          <p class="text-xs text-slate-400 mb-6">Enter system password to decrypt matrix configuration panels.</p>
-          
-          <div class="space-y-3">
-            <input type="password" id="modPasswordInput" placeholder="System Gate Password" class="w-full text-center bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-            <button onclick="verifyModPassword()" class="w-full bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl py-2.5 transition-colors">Authenticate Admin Token</button>
-            <p id="authErrorMessage" class="text-xs text-red-400 font-medium hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> Access denied. Tokens mismatch.</p>
-          </div>
+        <div id="modAuthView" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center max-w-md mx-auto my-8">
+          <h2 class="text-xl font-bold text-white mb-4">Staff Gatekeeper Portal</h2>
+          <input type="password" id="modPasswordInput" placeholder="System Gate Password" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-center text-sm mb-3">
+          <button onclick="verifyModPassword()" class="w-full bg-red-600 hover:bg-red-500 text-white rounded-xl py-2 font-semibold text-sm">Authenticate</button>
         </div>
 
         <div id="modDashboardView" class="hidden space-y-6">
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-gears text-red-500"></i> Master Controller Matrix
-              </h2>
-              <p class="text-xs text-slate-400">Dynamic system additions, overrides, map changes and mutations.</p>
-            </div>
-            <button onclick="lockModPanel()" class="bg-slate-950 border border-slate-800 text-slate-400 hover:text-white px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors"><i class="fa-solid fa-power-off mr-2 text-red-500"></i>Lock Dashboard</button>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-gears text-red-500 mr-2"></i>Global CMS Console</h2>
+            <button type="button" onclick="lockModPanel()" class="bg-slate-950 text-xs px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400">Lock</button>
           </div>
-
           <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
-            <div class="xl:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-              <h3 id="formActionTitle" class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span> Add Level Schema Node
-              </h3>
-              
-              <form id="levelMutationForm" onsubmit="handleLevelMutation(event)" class="space-y-4">
-                <input type="hidden" id="editLevelId" value="">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Level Name</label>
-                    <input type="text" id="modLevelName" required placeholder="e.g., Tidal Wave" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Author / Creator</label>
-                    <input type="text" id="modLevelCreator" required placeholder="e.g., OniLink" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Target Directory</label>
-                    <select id="modLevelTier" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-                      <option value="pemonlist">Pemonlist</option>
-                      <option value="classic">Classic List</option>
-                      <option value="legacy">Legacy List</option>
-                      <option value="challenge">Challenge List</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">List Target Position</label>
-                    <input type="number" id="modLevelRank" required min="1" placeholder="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Manual Points Override</label>
-                    <input type="number" id="modLevelScoreOverride" min="0" step="any" placeholder="Auto Engine Calc" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Showcase Clip/Video URL</label>
-                  <input type="url" id="modLevelVideo" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Context Summary</label>
-                  <textarea id="modLevelDesc" rows="2" placeholder="Brief history data regarding verification process steps..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500 custom-scrollbar"></textarea>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-slate-400 mb-1">Victors Matrix Set (JSON Object Format Array)</label>
-                  <textarea id="modLevelVictors" rows="2" placeholder='[{"name": "PlayerName", "proof": "https://video-url"}]' class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 font-mono text-xs text-emerald-400 focus:outline-none focus:border-red-500 custom-scrollbar"></textarea>
-                </div>
-
-                <div class="flex gap-2">
-                  <button type="submit" id="formSubmitBtn" class="flex-grow bg-red-600 hover:bg-red-500 text-white font-semibold text-xs rounded-xl py-2.5 transition-colors">Commit Entry Patch</button>
-                  <button type="button" id="formCancelBtn" onclick="resetMutationForm()" class="hidden bg-slate-950 border border-slate-800 text-slate-400 hover:text-white font-semibold text-xs rounded-xl px-4 py-2.5 transition-colors">Abort</button>
-                </div>
-              </form>
-            </div>
-
-            <div class="xl:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[510px]">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-hourglass text-amber-500"></i> Records Audit Queue
-              </h3>
-              <div id="approvalsQueueContainer" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 pr-1"></div>
-            </div>
+            <form id="levelMutationForm" onsubmit="handleLevelMutation(event)" class="xl:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <input type="hidden" id="editLevelId">
+              <div class="grid grid-cols-2 gap-4">
+                <input type="text" id="modLevelName" required placeholder="Level Name" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm text-white">
+                <input type="text" id="modLevelCreator" required placeholder="Creator Name" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm text-white">
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <select id="modLevelTier" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white"><option value="pemonlist">Pemonlist</option><option value="classic">Classic</option><option value="legacy">Legacy</option><option value="challenge">Challenge</option></select>
+                <input type="number" id="modLevelRank" required placeholder="Rank" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm text-white">
+                <input type="number" id="modLevelScoreOverride" placeholder="Override" class="bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm text-white">
+              </div>
+              <input type="url" id="modLevelVideo" placeholder="Showcase Video Link Proof" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm text-white">
+              <textarea id="modLevelDesc" placeholder="Description content details context summary brief..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-sm text-white"></textarea>
+              <textarea id="modLevelVictors" placeholder='Victors Array Template: [{"name": "Zoink", "proof": "link"}]' class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 font-mono text-xs text-white"></textarea>
+              <button type="submit" id="formSubmitBtn" class="w-full bg-red-600 py-2 rounded-xl text-xs font-semibold text-white">Publish to Live Network Matrix</button>
+            </form>
+            <div class="xl:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 h-[400px] flex flex-col"><h3 class="text-xs uppercase tracking-wider font-bold mb-3">Audit Submissions Queue</h3><div id="approvalsQueueContainer" class="flex-grow overflow-y-auto space-y-2"></div></div>
           </div>
-
-          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Complete Live Database Entries Matrix</h3>
-            <div class="overflow-x-auto custom-scrollbar">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-950 border border-slate-800 text-slate-400 uppercase">
-                  <tr>
-                    <th class="px-4 py-2.5 rounded-l-lg">Tier</th>
-                    <th class="px-4 py-2.5">Pos</th>
-                    <th class="px-4 py-2.5">Level Name</th>
-                    <th class="px-4 py-2.5">Creator Authority</th>
-                    <th class="px-4 py-2.5 text-right rounded-r-lg">Mod Operation Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="modDatabaseMatrixBody" class="divide-y divide-slate-800/40"></tbody>
-              </table>
-            </div>
-          </div>
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-950 text-slate-400"><tr><th class="p-2">Tier</th><th class="p-2">Pos</th><th class="p-2">Name</th><th class="p-2 text-right">Actions</th></tr></thead><tbody id="modDatabaseMatrixBody"></tbody></table></div>
         </div>
       </section>
     </div>
 
-    <!-- RIGHT DRAWER FRAMEWORK -->
     <div class="lg:col-span-1">
-      <div id="interactiveDrawerContainer" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sticky top-28 shadow-xl min-h-[400px] flex flex-col justify-between">
-        
-        <div id="drawerDefaultState" class="text-center py-20 my-auto">
-          <div class="text-slate-700 text-5xl mb-4"><i class="fa-solid fa-folder-open"></i></div>
-          <h3 class="text-sm font-bold text-slate-400">No Target Active</h3>
-          <p class="text-xs text-slate-500 max-w-[220px] mx-auto mt-2">Select a level entry node or leaderboard profile to inspect context properties instantly.</p>
+      <div id="interactiveDrawerContainer" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sticky top-28 min-h-[400px] flex flex-col justify-between">
+        <div id="drawerDefaultState" class="text-center py-20 text-slate-500"><i class="fa-solid fa-folder-open text-4xl mb-2"></i><p class="text-xs">Select any entry card or profile node row to inspect properties.</p></div>
+        <div id="drawerLevelState" class="hidden space-y-4">
+          <div class="flex justify-between border-b border-slate-800 pb-3"><h2 id="lvlDrawerName" class="text-xl font-black text-white"></h2><div id="lvlDrawerRank" class="text-xl font-black text-red-500"></div></div>
+          <p class="text-xs text-slate-400">By <span id="lvlDrawerCreator" class="text-slate-200"></span> (<span id="lvlDrawerTier" class="text-red-400 font-bold uppercase"></span>)</p>
+          <div id="lvlDrawerVideoWrapper" class="bg-slate-950 p-4 rounded-xl text-center border border-slate-800"><a id="lvlDrawerVideoBtn" href="#" target="_blank" class="text-xs text-red-500 font-bold hover:underline"><i class="fa-brands fa-youtube mr-1"></i>Watch Showcase</a></div>
+          <p id="lvlDrawerDesc" class="text-xs text-slate-300 leading-relaxed bg-slate-950 p-3 rounded-xl border border-slate-800"></p>
+          <div class="space-y-1"><h4 class="text-[10px] uppercase font-bold text-slate-400 flex justify-between"><span>Completions</span><span id="lvlDrawerVictorsCount"></span></h4><div id="lvlDrawerVictorsList" class="space-y-1 overflow-y-auto max-h-[140px]"></div></div>
         </div>
-
-        <div id="drawerLevelState" class="hidden flex-col h-full space-y-5 flex-grow">
-          <div class="border-b border-slate-800 pb-4 flex justify-between items-start gap-4">
-            <div>
-              <span id="lvlDrawerTier" class="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded">CLASSIC</span>
-              <h2 id="lvlDrawerName" class="text-2xl font-black text-white tracking-tight mt-1">Level</h2>
-              <p class="text-xs text-slate-400 mt-0.5">By <span id="lvlDrawerCreator" class="text-slate-300 font-medium">Author</span></p>
-            </div>
-            <div class="text-right">
-              <div id="lvlDrawerRank" class="text-2xl font-black text-red-500">#0</div>
-              <div id="lvlDrawerPoints" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">0 PTS</div>
-            </div>
-          </div>
-
-          <div id="lvlDrawerVideoWrapper" class="bg-slate-950 rounded-xl overflow-hidden aspect-video border border-slate-800 flex items-center justify-center relative">
-            <a id="lvlDrawerVideoBtn" href="#" target="_blank" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 hover:bg-slate-950/70 text-white transition-all group">
-              <i class="fa-brands fa-youtube text-red-600 text-4xl group-hover:scale-110 transition-transform"></i>
-              <span class="text-xs font-semibold tracking-wide mt-2 opacity-80 group-hover:opacity-100">Launch Showcase Proof</span>
-            </a>
-          </div>
-
-          <div class="space-y-1">
-            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">Context Summary</h4>
-            <p id="lvlDrawerDesc" class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed"></p>
-          </div>
-
-          <div class="space-y-2 flex-grow flex flex-col">
-            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex justify-between items-center">
-              <span>Verified Running Victors</span>
-              <span id="lvlDrawerVictorsCount" class="text-slate-500 font-normal">0 runs</span>
-            </h4>
-            <div id="lvlDrawerVictorsList" class="space-y-1.5 overflow-y-auto max-h-[180px] custom-scrollbar pr-1 flex-grow"></div>
-          </div>
+        <div id="drawerPlayerState" class="hidden space-y-4">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h2 id="plrDrawerName" class="text-lg font-bold text-white"></h2><div id="plrDrawerPoints" class="text-lg font-black text-emerald-400"></div></div>
+          <h4 class="text-[10px] uppercase font-bold text-slate-400">Verified Run Manifest</h4>
+          <div id="plrDrawerCompletionsList" class="space-y-2 overflow-y-auto max-h-[260px]"></div>
         </div>
-
-        <div id="drawerPlayerState" class="hidden flex-col h-full space-y-5 flex-grow">
-          <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
-            <div>
-              <div class="flex items-center gap-2">
-                <h2 id="plrDrawerName" class="text-xl font-bold text-white tracking-tight">Player</h2>
-                <span id="plrDrawerBadge" class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded">Badge</span>
-              </div>
-              <p class="text-xs text-slate-400 mt-1">Platform Status Position: <span id="plrDrawerRank" class="text-slate-200 font-semibold">#0</span></p>
-            </div>
-            <div class="text-right bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-              <div id="plrDrawerPoints" class="text-lg font-black text-emerald-400 leading-none">0.00</div>
-              <span class="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Aggregate Score</span>
-            </div>
-          </div>
-
-          <div class="flex-grow flex flex-col space-y-2">
-            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">Verified Completed Map Manifest</h4>
-            <div id="plrDrawerCompletionsList" class="space-y-2 overflow-y-auto max-h-[320px] custom-scrollbar pr-1 flex-grow"></div>
-          </div>
-        </div>
-
       </div>
     </div>
   </main>
@@ -338,386 +151,295 @@
   </footer>
 
   <script>
-// ==========================================
-// 🌐 GLOBAL CLOUD DATABASE CONFIGURATION
-// ==========================================
-// REPLACE "my_secret_mhsdl_list_v1" with a custom random phrase or numbers
-// to prevent other people from accidentally overwriting your levels.
-const CLOUD_BUCKET_ID = '4tWk1FmD67Yx6R3HkW78N4'; 
-const SECRET_LIST_KEY = 'my_secret_mhsdl_list_v1'; 
-const CLOUD_DB_URL = `https://kvdb.io/VW8YA2XdXtfzppozzwFDhb/`;
+    const CLOUD_BUCKET_ID = '4tWk1FmD67Yx6R3HkW78N4'; 
+    const SECRET_LIST_KEY = 'my_secret_mhsdl_list_v1'; 
+    const CLOUD_DB_URL = 'https://kvdb.io/8yTn6UHDSbKbnvZ1YuBdVW/';
 
-// Application System State
-let dbData = { levels: [], pendingSubmissions: [] };
-let currentTab = 'lists';
-let currentSubList = 'pemonlist';
-let isModAuthenticated = false;
-let searchQuery = '';
+    let dbData = { 
+      levels: [
+        { id: "lvl-default-1", name: "Acheron", creator: "Riot & More", tier: "pemonlist", rank: 1, description: "A top tier premium level.", video: "https://youtube.com", victors: [] },
+        { id: "lvl-default-2", name: "Bloodbath", creator: "Riot", tier: "classic", rank: 1, description: "Historical challenge map entry blueprint.", video: "https://youtube.com", victors: [] }
+      ], 
+      pendingSubmissions: [] 
+    };
 
-// ==========================================
-// 💾 LIVE NETWORK SYNCHRONISATION ENGINES
-// ==========================================
+    let currentTab = 'lists', currentSubList = 'pemonlist', isModAuthenticated = false, searchQuery = '';
 
-// Pulls data from the cloud so visitors see the updated list
-async function loadData() {
-  try {
-    const response = await fetch(CLOUD_DB_URL);
-    if (response.status === 200) {
-      dbData = await response.json();
-      console.log("Cloud Database synchronized successfully!");
-    } else {
-      // If the database is brand new and empty, upload a clean slate
-      console.log("Database initialized. Seeding blank slate configuration...");
-      await saveData();
-    }
-    renderAll();
-  } catch (err) {
-    console.error("Failed to connect to the cloud database server:", err);
-    renderAll();
-  }
-}
-
-// Sends updates to the cloud when a moderator adds/deletes a level
-async function saveData() {
-  try {
-    await fetch(CLOUD_DB_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dbData)
-    });
-  } catch (err) {
-    console.error("Network upload failure. Changes could not be synced globally:", err);
-  }
-}
-
-// ==========================================
-// 📊 SCORE ENGINEERING & LEADERBOARD SYSTEM
-// ==========================================
-function calculateLevelScore(level) {
-  if (level.scoreOverride) return parseFloat(level.scoreOverride);
-  const r = parseInt(level.rank) || 1;
-  
-  if (level.tier === 'pemonlist') return Math.max(600 - (r - 1) * 25, 100);
-  
-  if (level.tier === 'classic') {
-    let score = 500;
-    for (let i = 1; i < r; i++) {
-      if (score > 400) {
-        score -= 20;
-      } else {
-        score -= 3;
+    async function loadData() {
+      try {
+        const res = await fetch(CLOUD_DB_URL);
+        if (res.status === 200) {
+          dbData = await res.json();
+          console.log("Cloud database loaded.");
+        } else {
+          await saveData();
+        }
+        renderAll();
+      } catch (err) { 
+        console.warn("Initializing default database state.", err);
+        renderAll();
       }
     }
-    return Math.max(score, 5);
-  }
-  
-  if (level.tier === 'legacy') return Math.max(50 - (r - 1) * 2, 5);
-  if (level.tier === 'challenge') return Math.max(150 - (r - 1) * 10, 10);
-  return 0;
-}
 
-function getLeaderboard() {
-  let playerMap = {};
-  dbData.levels.forEach(lvl => {
-    const points = calculateLevelScore(lvl);
-    if (lvl.victors) {
-      lvl.victors.forEach(v => {
-        const pName = v.name.trim();
-        if (!playerMap[pName]) playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
-        playerMap[pName].totalPoints += points;
-        playerMap[pName].completions.push({
-          levelName: lvl.name,
-          tier: lvl.tier,
-          rank: lvl.rank,
-          pointsEarned: points,
-          proof: v.proof
+    async function saveData() {
+      try {
+        await fetch(CLOUD_DB_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dbData)
         });
+      } catch(err) {
+        console.error("Cloud syncing failure.", err);
+      }
+    }
+
+    function calculateLevelScore(level) {
+      if (level.scoreOverride) return parseFloat(level.scoreOverride);
+      const r = parseInt(level.rank) || 1;
+      if (level.tier === 'pemonlist') return Math.max(600 - (r - 1) * 25, 100);
+      if (level.tier === 'classic') {
+        let score = 500;
+        for (let i = 1; i < r; i++) { score > 400 ? score -= 20 : score -= 3; }
+        return Math.max(score, 5);
+      }
+      if (level.tier === 'legacy') return Math.max(50 - (r - 1) * 2, 5);
+      if (level.tier === 'challenge') return Math.max(150 - (r - 1) * 10, 10);
+      return 0;
+    }
+
+    function getLeaderboard() {
+      let playerMap = {};
+      dbData.levels.forEach(lvl => {
+        const points = calculateLevelScore(lvl);
+        if (lvl.victors) {
+          lvl.victors.forEach(v => {
+            const pName = v.name.trim();
+            if (!playerMap[pName]) playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
+            playerMap[pName].totalPoints += points;
+            playerMap[pName].completions.push({ levelName: lvl.name, tier: lvl.tier, rank: lvl.rank, pointsEarned: points, proof: v.proof });
+          });
+        }
+      });
+      return Object.values(playerMap).sort((a,b) => b.totalPoints - a.totalPoints);
+    }
+
+    function renderAll() {
+      renderLevelList();
+      renderLeaderboard();
+      renderSubmissionSelect();
+      renderModPanel();
+    }
+
+    function renderLevelList() {
+      const container = document.getElementById('levelListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      let filtered = dbData.levels.filter(l => l.tier === currentSubList);
+      if (searchQuery) {
+        filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) || l.creator.toLowerCase().includes(searchQuery));
+      } else { filtered.sort((a,b) => a.rank - b.rank); }
+
+      filtered.forEach(lvl => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-slate-700 shadow-md";
+        card.onclick = () => openLevelDrawer(lvl.id);
+        card.innerHTML = `<div><span class="text-slate-500 font-bold mr-2">#${lvl.rank}</span><span class="text-white font-bold">${lvl.name}</span><p class="text-xs text-slate-400">by ${lvl.creator}</p></div><div class="text-right"><span class="text-xs font-black text-red-500">${calculateLevelScore(lvl).toFixed(0)} Pts</span></div>`;
+        container.appendChild(card);
       });
     }
-  });
-  return Object.values(playerMap).sort((a, b) => b.totalPoints - a.totalPoints);
-}
 
-// ==========================================
-// 🖥️ UI INTERFACE RENDERING ENGINE
-// ==========================================
-function renderAll() {
-  renderLevelList();
-  renderLeaderboard();
-  renderSubmissionSelect();
-  renderModPanel();
-}
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboardTableBody'); 
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      getLeaderboard().forEach((p, i) => {
+        const tr = document.createElement('tr'); tr.className = "cursor-pointer hover:bg-slate-850/40 border-b border-slate-900";
+        tr.onclick = () => openPlayerDrawer(p.name);
+        tr.innerHTML = `<td class="p-3 text-slate-400">#${i+1}</td><td class="p-3 text-white font-semibold">${p.name}</td><td class="p-3 text-right text-emerald-400 font-bold">${p.totalPoints.toFixed(1)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
 
-function renderLevelList() {
-  const container = document.getElementById('levelListContainer');
-  if (!container) return;
-  container.innerHTML = '';
-  
-  let filtered = dbData.levels.filter(l => l.tier === currentSubList);
-  if (searchQuery) {
-    filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) || l.creator.toLowerCase().includes(searchQuery));
-  } else {
-    filtered.sort((a, b) => a.rank - b.rank);
-  }
+    function renderSubmissionSelect() {
+      const select = document.getElementById('submitTargetLevel'); 
+      if (!select) return;
+      select.innerHTML = '';
+      dbData.levels.forEach(l => { select.innerHTML += `<option value="${l.id}">${l.name} (${l.tier.toUpperCase()})</option>`; });
+    }
 
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800 rounded-xl">No active levels found in this category.</div>`;
-    return;
-  }
+    function openLevelDrawer(id) {
+      const lvl = dbData.levels.find(l => l.id === id); if (!lvl) return;
+      document.getElementById('drawerDefaultState').classList.add('hidden');
+      document.getElementById('drawerPlayerState').classList.add('hidden');
+      const state = document.getElementById('drawerLevelState'); state.classList.remove('hidden');
+      document.getElementById('lvlDrawerName').innerText = lvl.name;
+      document.getElementById('lvlDrawerRank').innerText = `#${lvl.rank}`;
+      document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
+      document.getElementById('lvlDrawerTier').innerText = lvl.tier;
+      document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No context notes provided.";
+      document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
+      const list = document.getElementById('lvlDrawerVictorsList'); list.innerHTML = '';
+      if(lvl.victors) {
+        lvl.victors.forEach(v => {
+          list.innerHTML += `<a href="${v.proof}" target="_blank" class="block bg-slate-950 p-2 rounded border border-slate-800 text-xs text-slate-300 hover:text-red-400 flex justify-between"><span>${v.name}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
+        });
+      }
+      document.getElementById('lvlDrawerVictorsCount').innerText = lvl.victors ? lvl.victors.length + ' runs' : '0 runs';
+    }
 
-  filtered.forEach(lvl => {
-    const card = document.createElement('div');
-    card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-slate-700 shadow-md transition-all";
-    card.onclick = () => openLevelDrawer(lvl.id);
-    card.innerHTML = `
-      <div>
-        <span class="text-slate-500 font-bold mr-2">#${lvl.rank}</span>
-        <span class="text-white font-bold">${lvl.name}</span>
-        <p class="text-xs text-slate-400">by ${lvl.creator}</p>
-      </div>
-      <div class="text-right">
-        <span class="text-xs font-black text-red-500">${calculateLevelScore(lvl).toFixed(0)} Pts</span>
-      </div>
-    `;
-    container.appendChild(card);
-  });
-}
+    function openPlayerDrawer(name) {
+      const p = getLeaderboard().find(pl => pl.name === name); if (!p) return;
+      document.getElementById('drawerDefaultState').classList.add('hidden');
+      document.getElementById('drawerLevelState').classList.add('hidden');
+      const state = document.getElementById('drawerPlayerState'); state.classList.remove('hidden');
+      document.getElementById('plrDrawerName').innerText = p.name;
+      document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
+      const list = document.getElementById('plrDrawerCompletionsList'); list.innerHTML = '';
+      p.completions.forEach(c => {
+        list.innerHTML += `<div class="bg-slate-950 p-2 rounded text-xs"><div class="flex justify-between font-bold text-white"><span>${c.levelName}</span><span class="text-emerald-400">+${c.pointsEarned.toFixed(0)}</span></div><span class="text-[10px] text-slate-500 uppercase">${c.tier} #${c.rank}</span></div>`;
+      });
+    }
 
-function renderLeaderboard() {
-  const tbody = document.getElementById('leaderboardTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  
-  getLeaderboard().forEach((p, i) => {
-    const tr = document.createElement('tr');
-    tr.className = "cursor-pointer hover:bg-slate-850/40 border-b border-slate-900 transition-colors";
-    tr.onclick = () => openPlayerDrawer(p.name);
-    tr.innerHTML = `
-      <td class="p-3 text-slate-400 font-bold">#${i+1}</td>
-      <td class="p-3 text-white font-semibold hover:text-red-400">${p.name}</td>
-      <td class="p-3 text-right text-emerald-400 font-bold">${p.totalPoints.toFixed(1)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
+    async function handleRecordSubmit(e) {
+      e.preventDefault();
+      dbData.pendingSubmissions.push({
+        id: "sub-" + Date.now(),
+        playerName: document.getElementById('submitPlayerName').value.trim(),
+        levelId: document.getElementById('submitTargetLevel').value,
+        videoUrl: document.getElementById('submitVideoUrl').value.trim()
+      });
+      await saveData();
+      alert('Record sent into the shared server review queue.');
+      document.getElementById('recordSubmissionForm').reset();
+      loadData();
+    }
 
-function renderSubmissionSelect() {
-  const select = document.getElementById('submitTargetLevel');
-  if (!select) return;
-  select.innerHTML = '';
-  dbData.levels.forEach(l => {
-    select.innerHTML += `<option value="${l.id}">${l.name} (${l.tier.toUpperCase()} #${l.rank})</option>`;
-  });
-}
+    async function handleLevelMutation(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editLevelId').value;
+      
+      let victorsParsed = [];
+      const victorsRaw = document.getElementById('modLevelVictors').value.trim();
+      if (victorsRaw) {
+        try { victorsParsed = JSON.parse(victorsRaw); } 
+        catch(err) { alert("Invalid JSON array formatting string layout."); return; }
+      }
 
-// ==========================================
-// 📂 INTERACTIVE SIDE SLIDEOUT DRAWERS
-// ==========================================
-function openLevelDrawer(id) {
-  const lvl = dbData.levels.find(l => l.id === id);
-  if (!lvl) return;
-  
-  document.getElementById('drawerDefaultState').classList.add('hidden');
-  document.getElementById('drawerPlayerState').classList.add('hidden');
-  document.getElementById('drawerLevelState').classList.remove('hidden');
-  
-  document.getElementById('lvlDrawerName').innerText = lvl.name;
-  document.getElementById('lvlDrawerRank').innerText = `#${lvl.rank}`;
-  document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
-  document.getElementById('lvlDrawerTier').innerText = lvl.tier;
-  document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No description provided.";
-  document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
-  
-  const list = document.getElementById('lvlDrawerVictorsList');
-  list.innerHTML = '';
-  if (lvl.victors && lvl.victors.length > 0) {
-    document.getElementById('lvlDrawerVictorsCount').innerText = `${lvl.victors.length} runs`;
-    lvl.victors.forEach(v => {
-      list.innerHTML += `
-        <a href="${v.proof}" target="_blank" class="block bg-slate-950 p-2.5 rounded border border-slate-800 text-xs text-slate-300 hover:text-red-400 flex justify-between items-center transition-all">
-          <span><i class="fa-solid fa-user-check mr-2 text-slate-500"></i>${v.name}</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-        </a>`;
-    });
-  } else {
-    document.getElementById('lvlDrawerVictorsCount').innerText = "0 runs";
-    list.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-2">No victors yet.</p>`;
-  }
-}
+      const body = {
+        id: editId || "lvl-" + Date.now(),
+        name: document.getElementById('modLevelName').value.trim(),
+        creator: document.getElementById('modLevelCreator').value.trim(),
+        tier: document.getElementById('modLevelTier').value,
+        rank: parseInt(document.getElementById('modLevelRank').value) || 1,
+        scoreOverride: document.getElementById('modLevelScoreOverride').value ? parseFloat(document.getElementById('modLevelScoreOverride').value) : null,
+        video: document.getElementById('modLevelVideo').value.trim(),
+        description: document.getElementById('modLevelDesc').value.trim(),
+        victors: editId && !victorsRaw ? (dbData.levels.find(l => l.id === editId)?.victors || []) : victorsParsed
+      };
 
-function openPlayerDrawer(name) {
-  const p = getLeaderboard().find(pl => pl.name === name);
-  if (!p) return;
-  
-  document.getElementById('drawerDefaultState').classList.add('hidden');
-  document.getElementById('drawerLevelState').classList.add('hidden');
-  document.getElementById('drawerPlayerState').classList.remove('hidden');
-  
-  document.getElementById('plrDrawerName').innerText = p.name;
-  document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
-  
-  const list = document.getElementById('plrDrawerCompletionsList');
-  list.innerHTML = '';
-  p.completions.forEach(c => {
-    list.innerHTML += `
-      <div class="bg-slate-950 p-3 rounded border border-slate-800/60 text-xs">
-        <div class="flex justify-between font-bold text-white">
-          <span>${c.levelName}</span>
-          <span class="text-emerald-400">+${c.pointsEarned.toFixed(0)}</span>
-        </div>
-        <span class="text-[10px] text-slate-500 uppercase">${c.tier} Position #${c.rank}</span>
-      </div>`;
-  });
-}
+      if (editId) {
+        const idx = dbData.levels.findIndex(l => l.id === editId);
+        if (idx !== -1) dbData.levels[idx] = body;
+      } else {
+        dbData.levels.push(body);
+      }
 
-// ==========================================
-// 🛡️ STAFF OPERATIONS & VERIFICATION FORMS
-// ==========================================
-async function handleRecordSubmit(e) {
-  e.preventDefault();
-  dbData.pendingSubmissions.push({
-    id: "sub-" + Date.now(),
-    playerName: document.getElementById('submitPlayerName').value.trim(),
-    levelId: document.getElementById('submitTargetLevel').value,
-    videoUrl: document.getElementById('submitVideoUrl').value.trim()
-  });
-  
-  await saveData();
-  alert('Record submitted to the cloud review queue.');
-  document.getElementById('recordSubmissionForm').reset();
-  loadData();
-}
+      await saveData();
+      document.getElementById('levelMutationForm').reset();
+      document.getElementById('editLevelId').value = '';
+      loadData();
+    }
 
-async function handleLevelMutation(e) {
-  e.preventDefault();
-  const editId = document.getElementById('editLevelId').value;
-  
-  let victorsParsed = [];
-  const victorsRaw = document.getElementById('modLevelVictors').value.trim();
-  if (victorsRaw) {
-    try { victorsParsed = JSON.parse(victorsRaw); } 
-    catch(err) { alert("Invalid JSON formatting syntax in victors field."); return; }
-  }
+    async function deleteLevel(id) {
+      if(confirm("Purge row globally?")) {
+        dbData.levels = dbData.levels.filter(l => l.id !== id);
+        await saveData();
+        loadData();
+      }
+    }
 
-  const body = {
-    id: editId || "lvl-" + Date.now(),
-    name: document.getElementById('modLevelName').value.trim(),
-    creator: document.getElementById('modLevelCreator').value.trim(),
-    tier: document.getElementById('modLevelTier').value,
-    rank: parseInt(document.getElementById('modLevelRank').value) || 1,
-    scoreOverride: document.getElementById('modLevelScoreOverride').value ? parseFloat(document.getElementById('modLevelScoreOverride').value) : null,
-video: document.getElementById('modLevelVideo').value.trim(),
-description: document.getElementById('modLevelDesc').value.trim(),
-victors: editId && !victorsRaw ? (dbData.levels.find(l => l.id === editId)?.victors || []) : victorsParsed
-};
-if (editId) {
-const idx = dbData.levels.findIndex(l => l.id === editId);
-if (idx !== -1) dbData.levels[idx] = body;
-} else {
-dbData.levels.push(body);
-}
-await saveData();
-document.getElementById('levelMutationForm').reset();
-document.getElementById('editLevelId').value = '';
-loadData();
-alert("Cloud Database updated successfully!");
-}
-async function deleteLevel(id) {
-if (confirm("Permanently wipe this level entry from the cloud database?")) {
-dbData.levels = dbData.levels.filter(l => l.id !== id);
-await saveData();
-loadData();
-}
-}
-async function approveRecord(id) {
-const sub = dbData.pendingSubmissions.find(s => s.id === id);
-if (sub) {
-const lvl = dbData.levels.find(l => l.id === sub.levelId);
-if (lvl) {
-if (!lvl.victors) lvl.victors = [];
-lvl.victors.push({ name: sub.playerName, proof: sub.videoUrl });
-}
-dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
-await saveData();
-}
-loadData();
-}
-async function rejectRecord(id) {
-dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
-await saveData();
-loadData();
-}
-function renderModPanel() {
-if (!isModAuthenticated) return;
-const q = document.getElementById('approvalsQueueContainer');
-if (q) {
-q.innerHTML = '';
-if (dbData.pendingSubmissions.length === 0) {
-q.innerHTML = <p class="text-xs text-slate-500 italic text-center py-8">No records pending audit.</p>;
-}
-dbData.pendingSubmissions.forEach(s => {
-const lvl = dbData.levels.find(l => l.id === s.levelId);
-q.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800 text-xs"> <div class="flex justify-between mb-2"> <span><b>${s.playerName}</b> verified on <i>${lvl ? lvl.name : 'Unknown'}</i></span> <a href="${s.videoUrl}" target="_blank" class="text-blue-400 hover:underline">Link</a> </div> <div class="flex gap-2"> <button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-1 rounded font-bold text-[10px] text-white">Approve</button> <button onclick="rejectRecord('${s.id}')" class="bg-slate-800 px-2 py-1 rounded text-[10px] text-slate-400">Deny</button> </div> </div>;
-});
-}
-const matrix = document.getElementById('modDatabaseMatrixBody');
-if (matrix) {
-matrix.innerHTML = '';
-dbData.levels.sort((a,b)=>a.tier.localeCompare(b.tier) || a.rank - b.rank).forEach(l => {
-matrix.innerHTML += `
-${l.tier}
-#${l.rank}
-${l.name}
-`;
-});
-}
-}
-function initiateEdit(id) {
-const l = dbData.levels.find(lvl => lvl.id === id);
-if (!l) return;
-document.getElementById('editLevelId').value = l.id;
-document.getElementById('modLevelName').value = l.name;
-document.getElementById('modLevelCreator').value = l.creator;
-document.getElementById('modLevelTier').value = l.tier;
-document.getElementById('modLevelRank').value = l.rank;
-document.getElementById('modLevelScoreOverride').value = l.scoreOverride || '';
-document.getElementById('modLevelVideo').value = l.video || '';
-document.getElementById('modLevelDesc').value = l.description || '';
-document.getElementById('modLevelVictors').value = JSON.stringify(l.victors || []);
-}
-function verifyModPassword() {
-// CONFIGURATION PASSWORD VERIFICATION
-if (document.getElementById('modPasswordInput').value === 'MHSDL#42') {
-isModAuthenticated = true;
-document.getElementById('modAuthView').classList.add('hidden');
-document.getElementById('modDashboardView').classList.remove('hidden');
-renderModPanel();
-} else { alert('Access Token Invalid'); }
-}
-function lockModPanel() {
-isModAuthenticated = false;
-document.getElementById('modAuthView').classList.remove('hidden');
-document.getElementById('modDashboardView').classList.add('hidden');
-document.getElementById('modPasswordInput').value = '';
-}
-// NAVIGATION FLOW LOGIC
-function switchTab(t) {
-currentTab = t;
-document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-document.getElementById(section-${t}).classList.remove('hidden');
-document.querySelectorAll('nav button').forEach(b => b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white");
-document.getElementById(tabBtn-${t}).className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white";
-}
-function switchSubList(s) {
-currentSubList = s;
-document.querySelectorAll('[id^="subListBtn-"]').forEach(b => b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50");
-document.getElementById(subListBtn-${s}).className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700";
-renderLevelList();
-}
-function handleSearch(v) { searchQuery = v.toLowerCase().trim(); renderLevelList(); }
-// BOOT ENGINE
-document.addEventListener('DOMContentLoaded', loadData);
+    async function approveRecord(id) {
+      const sub = dbData.pendingSubmissions.find(s => s.id === id);
+      if (sub) {
+        const lvl = dbData.levels.find(l => l.id === sub.levelId);
+        if (lvl) {
+          if (!lvl.victors) lvl.victors = [];
+          lvl.victors.push({ name: sub.playerName, proof: sub.videoUrl });
+        }
+        dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
+        await saveData();
+      }
+      loadData();
+    }
 
+    async function rejectRecord(id) {
+      dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
+      await saveData();
+      loadData();
+    }
+
+    function renderModPanel() {
+      if (!isModAuthenticated) return;
+      const q = document.getElementById('approvalsQueueContainer'); 
+      if (!q) return;
+      q.innerHTML = '';
+      dbData.pendingSubmissions.forEach(s => {
+        const lvl = dbData.levels.find(l => l.id === s.levelId);
+        q.innerHTML += `<div class="bg-slate-950 p-2.5 rounded border border-slate-800 text-xs"><div class="flex justify-between"><span><b>${s.playerName}</b> -> ${lvl ? lvl.name : 'Unknown'}</span><a href="${s.videoUrl}" target="_blank" class="text-blue-400">Proof</a></div><div class="flex gap-2 mt-2"><button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-0.5 rounded text-[10px]">Approve</button><button onclick="rejectRecord('${s.id}')" class="bg-slate-800 px-2 py-0.5 rounded text-[10px]">Deny</button></div></div>`;
+      });
+      const matrix = document.getElementById('modDatabaseMatrixBody'); 
+      if (!matrix) return;
+      matrix.innerHTML = '';
+      dbData.levels.forEach(l => {
+        matrix.innerHTML += `<tr class="border-b border-slate-900"><td class="p-2 uppercase text-slate-500 font-mono">${l.tier}</td><td class="p-2 font-bold">#${l.rank}</td><td class="p-2 text-white">${l.name}</td><td class="p-2 text-right"><button onclick="initiateEdit('${l.id}')" class="bg-slate-800 text-white px-2 py-0.5 rounded mr-1">Edit</button><button onclick="deleteLevel('${l.id}')" class="bg-red-950 text-red-400 px-2 py-0.5 rounded">Del</button></td></tr>`;
+      });
+    }
+
+    function initiateEdit(id) {
+      const l = dbData.levels.find(lvl => lvl.id === id); if(!l) return;
+      document.getElementById('editLevelId').value = l.id;
+      document.getElementById('modLevelName').value = l.name;
+      document.getElementById('modLevelCreator').value = l.creator;
+      document.getElementById('modLevelTier').value = l.tier;
+      document.getElementById('modLevelRank').value = l.rank;
+      document.getElementById('modLevelScoreOverride').value = l.scoreOverride || '';
+      document.getElementById('modLevelVideo').value = l.video || '';
+      document.getElementById('modLevelDesc').value = l.description || '';
+      document.getElementById('modLevelVictors').value = JSON.stringify(l.victors || []);
+    }
+
+    function verifyModPassword() {
+      if (document.getElementById('modPasswordInput').value === 'MHSDL#42') {
+        isModAuthenticated = true;
+        document.getElementById('modAuthView').classList.add('hidden');
+        document.getElementById('modDashboardView').classList.remove('hidden');
+        renderModPanel();
+      } else { alert('Access Denied'); }
+    }
+
+    function lockModPanel() {
+      isModAuthenticated = false;
+      document.getElementById('modAuthView').classList.remove('hidden');
+      document.getElementById('modDashboardView').classList.add('hidden');
+      document.getElementById('modPasswordInput').value = '';
+    }
+
+    function switchTab(t) {
+      currentTab = t; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`section-${t}`).classList.remove('hidden');
+      document.querySelectorAll('nav button').forEach(b => b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white");
+      document.getElementById(`tabBtn-${t}`).className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white";
+    }
+
+    function switchSubList(s) {
+      currentSubList = s; document.querySelectorAll('[id^="subListBtn-"]').forEach(b => b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50");
+      document.getElementById(`subListBtn-${s}`).className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700";
+      renderLevelList();
+    }
+
+    function handleSearch(v) { searchQuery = v.toLowerCase().trim(); renderLevelList(); }
+
+    document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
 </html>
