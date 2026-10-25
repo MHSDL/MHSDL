@@ -151,295 +151,384 @@
   </footer>
 
   <script>
-    const CLOUD_BUCKET_ID = '4tWk1FmD67Yx6R3HkW78N4'; 
-    const SECRET_LIST_KEY = 'my_secret_mhsdl_list_v1'; 
-    const CLOUD_DB_URL = 'https://kvdb.io/8yTn6UHDSbKbnvZ1YuBdVW/';
+// ==========================================
+// 🌐 GLOBAL CLOUD DATABASE CONFIGURATION
+// ==========================================
+// We use JSONbin's completely free public bin system.
+// This allows saving data dynamically from GitHub Pages without requiring an account.
+const CLOUD_DB_URL = 'https://jsonbin.io';
 
-    let dbData = { 
-      levels: [
-        { id: "lvl-default-1", name: "Acheron", creator: "Riot & More", tier: "pemonlist", rank: 1, description: "A top tier premium level.", video: "https://youtube.com", victors: [] },
-        { id: "lvl-default-2", name: "Bloodbath", creator: "Riot", tier: "classic", rank: 1, description: "Historical challenge map entry blueprint.", video: "https://youtube.com", victors: [] }
-      ], 
-      pendingSubmissions: [] 
-    };
+// Application System State
+let dbData = { levels: [], pendingSubmissions: [] };
+let currentTab = 'lists';
+let currentSubList = 'pemonlist';
+let isModAuthenticated = false;
+let searchQuery = '';
 
-    let currentTab = 'lists', currentSubList = 'pemonlist', isModAuthenticated = false, searchQuery = '';
-
-    async function loadData() {
-      try {
-        const res = await fetch(CLOUD_DB_URL);
-        if (res.status === 200) {
-          dbData = await res.json();
-          console.log("Cloud database loaded.");
-        } else {
-          await saveData();
-        }
-        renderAll();
-      } catch (err) { 
-        console.warn("Initializing default database state.", err);
-        renderAll();
-      }
+// ==========================================
+// 💾 LIVE NETWORK SYNCHRONISATION ENGINES
+// ==========================================
+async function loadData() {
+  try {
+    const response = await fetch(CLOUD_DB_URL);
+    if (response.ok) {
+      dbData = await response.json();
+      console.log("Cloud Database synchronized successfully!");
+    } else {
+      console.warn("Initializing clean state configuration...");
     }
+    renderAll();
+  } catch (err) {
+    console.error("Failed to connect to the cloud database server:", err);
+    renderAll();
+  }
+}
 
-    async function saveData() {
-      try {
-        await fetch(CLOUD_DB_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dbData)
-        });
-      } catch(err) {
-        console.error("Cloud syncing failure.", err);
-      }
-    }
+async function saveData() {
+  try {
+    await fetch(CLOUD_DB_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dbData)
+    });
+  } catch (err) {
+    console.error("Network upload failure. Changes could not be synced globally:", err);
+  }
+}
 
-    function calculateLevelScore(level) {
-      if (level.scoreOverride) return parseFloat(level.scoreOverride);
-      const r = parseInt(level.rank) || 1;
-      if (level.tier === 'pemonlist') return Math.max(600 - (r - 1) * 25, 100);
-      if (level.tier === 'classic') {
-        let score = 500;
-        for (let i = 1; i < r; i++) { score > 400 ? score -= 20 : score -= 3; }
-        return Math.max(score, 5);
-      }
-      if (level.tier === 'legacy') return Math.max(50 - (r - 1) * 2, 5);
-      if (level.tier === 'challenge') return Math.max(150 - (r - 1) * 10, 10);
-      return 0;
-    }
-
-    function getLeaderboard() {
-      let playerMap = {};
-      dbData.levels.forEach(lvl => {
-        const points = calculateLevelScore(lvl);
-        if (lvl.victors) {
-          lvl.victors.forEach(v => {
-            const pName = v.name.trim();
-            if (!playerMap[pName]) playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
-            playerMap[pName].totalPoints += points;
-            playerMap[pName].completions.push({ levelName: lvl.name, tier: lvl.tier, rank: lvl.rank, pointsEarned: points, proof: v.proof });
-          });
-        }
-      });
-      return Object.values(playerMap).sort((a,b) => b.totalPoints - a.totalPoints);
-    }
-
-    function renderAll() {
-      renderLevelList();
-      renderLeaderboard();
-      renderSubmissionSelect();
-      renderModPanel();
-    }
-
-    function renderLevelList() {
-      const container = document.getElementById('levelListContainer');
-      if (!container) return;
-      container.innerHTML = '';
-      let filtered = dbData.levels.filter(l => l.tier === currentSubList);
-      if (searchQuery) {
-        filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) || l.creator.toLowerCase().includes(searchQuery));
-      } else { filtered.sort((a,b) => a.rank - b.rank); }
-
-      filtered.forEach(lvl => {
-        const card = document.createElement('div');
-        card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-slate-700 shadow-md";
-        card.onclick = () => openLevelDrawer(lvl.id);
-        card.innerHTML = `<div><span class="text-slate-500 font-bold mr-2">#${lvl.rank}</span><span class="text-white font-bold">${lvl.name}</span><p class="text-xs text-slate-400">by ${lvl.creator}</p></div><div class="text-right"><span class="text-xs font-black text-red-500">${calculateLevelScore(lvl).toFixed(0)} Pts</span></div>`;
-        container.appendChild(card);
-      });
-    }
-
-    function renderLeaderboard() {
-      const tbody = document.getElementById('leaderboardTableBody'); 
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      getLeaderboard().forEach((p, i) => {
-        const tr = document.createElement('tr'); tr.className = "cursor-pointer hover:bg-slate-850/40 border-b border-slate-900";
-        tr.onclick = () => openPlayerDrawer(p.name);
-        tr.innerHTML = `<td class="p-3 text-slate-400">#${i+1}</td><td class="p-3 text-white font-semibold">${p.name}</td><td class="p-3 text-right text-emerald-400 font-bold">${p.totalPoints.toFixed(1)}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function renderSubmissionSelect() {
-      const select = document.getElementById('submitTargetLevel'); 
-      if (!select) return;
-      select.innerHTML = '';
-      dbData.levels.forEach(l => { select.innerHTML += `<option value="${l.id}">${l.name} (${l.tier.toUpperCase()})</option>`; });
-    }
-
-    function openLevelDrawer(id) {
-      const lvl = dbData.levels.find(l => l.id === id); if (!lvl) return;
-      document.getElementById('drawerDefaultState').classList.add('hidden');
-      document.getElementById('drawerPlayerState').classList.add('hidden');
-      const state = document.getElementById('drawerLevelState'); state.classList.remove('hidden');
-      document.getElementById('lvlDrawerName').innerText = lvl.name;
-      document.getElementById('lvlDrawerRank').innerText = `#${lvl.rank}`;
-      document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
-      document.getElementById('lvlDrawerTier').innerText = lvl.tier;
-      document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No context notes provided.";
-      document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
-      const list = document.getElementById('lvlDrawerVictorsList'); list.innerHTML = '';
-      if(lvl.victors) {
-        lvl.victors.forEach(v => {
-          list.innerHTML += `<a href="${v.proof}" target="_blank" class="block bg-slate-950 p-2 rounded border border-slate-800 text-xs text-slate-300 hover:text-red-400 flex justify-between"><span>${v.name}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>`;
-        });
-      }
-      document.getElementById('lvlDrawerVictorsCount').innerText = lvl.victors ? lvl.victors.length + ' runs' : '0 runs';
-    }
-
-    function openPlayerDrawer(name) {
-      const p = getLeaderboard().find(pl => pl.name === name); if (!p) return;
-      document.getElementById('drawerDefaultState').classList.add('hidden');
-      document.getElementById('drawerLevelState').classList.add('hidden');
-      const state = document.getElementById('drawerPlayerState'); state.classList.remove('hidden');
-      document.getElementById('plrDrawerName').innerText = p.name;
-      document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
-      const list = document.getElementById('plrDrawerCompletionsList'); list.innerHTML = '';
-      p.completions.forEach(c => {
-        list.innerHTML += `<div class="bg-slate-950 p-2 rounded text-xs"><div class="flex justify-between font-bold text-white"><span>${c.levelName}</span><span class="text-emerald-400">+${c.pointsEarned.toFixed(0)}</span></div><span class="text-[10px] text-slate-500 uppercase">${c.tier} #${c.rank}</span></div>`;
-      });
-    }
-
-    async function handleRecordSubmit(e) {
-      e.preventDefault();
-      dbData.pendingSubmissions.push({
-        id: "sub-" + Date.now(),
-        playerName: document.getElementById('submitPlayerName').value.trim(),
-        levelId: document.getElementById('submitTargetLevel').value,
-        videoUrl: document.getElementById('submitVideoUrl').value.trim()
-      });
-      await saveData();
-      alert('Record sent into the shared server review queue.');
-      document.getElementById('recordSubmissionForm').reset();
-      loadData();
-    }
-
-    async function handleLevelMutation(e) {
-      e.preventDefault();
-      const editId = document.getElementById('editLevelId').value;
-      
-      let victorsParsed = [];
-      const victorsRaw = document.getElementById('modLevelVictors').value.trim();
-      if (victorsRaw) {
-        try { victorsParsed = JSON.parse(victorsRaw); } 
-        catch(err) { alert("Invalid JSON array formatting string layout."); return; }
-      }
-
-      const body = {
-        id: editId || "lvl-" + Date.now(),
-        name: document.getElementById('modLevelName').value.trim(),
-        creator: document.getElementById('modLevelCreator').value.trim(),
-        tier: document.getElementById('modLevelTier').value,
-        rank: parseInt(document.getElementById('modLevelRank').value) || 1,
-        scoreOverride: document.getElementById('modLevelScoreOverride').value ? parseFloat(document.getElementById('modLevelScoreOverride').value) : null,
-        video: document.getElementById('modLevelVideo').value.trim(),
-        description: document.getElementById('modLevelDesc').value.trim(),
-        victors: editId && !victorsRaw ? (dbData.levels.find(l => l.id === editId)?.victors || []) : victorsParsed
-      };
-
-      if (editId) {
-        const idx = dbData.levels.findIndex(l => l.id === editId);
-        if (idx !== -1) dbData.levels[idx] = body;
+// ==========================================
+// 📊 SCORE ENGINEERING & LEADERBOARD SYSTEM
+// ==========================================
+function calculateLevelScore(level) {
+  if (level.scoreOverride) return parseFloat(level.scoreOverride);
+  const r = parseInt(level.rank) || 1;
+  
+  if (level.tier === 'pemonlist') return Math.max(600 - (r - 1) * 25, 100);
+  
+  if (level.tier === 'classic') {
+    let score = 500;
+    for (let i = 1; i < r; i++) {
+      if (score > 400) {
+        score -= 20;
       } else {
-        dbData.levels.push(body);
-      }
-
-      await saveData();
-      document.getElementById('levelMutationForm').reset();
-      document.getElementById('editLevelId').value = '';
-      loadData();
-    }
-
-    async function deleteLevel(id) {
-      if(confirm("Purge row globally?")) {
-        dbData.levels = dbData.levels.filter(l => l.id !== id);
-        await saveData();
-        loadData();
+        score -= 3;
       }
     }
+    return Math.max(score, 5);
+  }
+  
+  if (level.tier === 'legacy') return Math.max(50 - (r - 1) * 2, 5);
+  if (level.tier === 'challenge') return Math.max(150 - (r - 1) * 10, 10);
+  return 0;
+}
 
-    async function approveRecord(id) {
-      const sub = dbData.pendingSubmissions.find(s => s.id === id);
-      if (sub) {
-        const lvl = dbData.levels.find(l => l.id === sub.levelId);
-        if (lvl) {
-          if (!lvl.victors) lvl.victors = [];
-          lvl.victors.push({ name: sub.playerName, proof: sub.videoUrl });
-        }
-        dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
-        await saveData();
+function getLeaderboard() {
+  let playerMap = {};
+  if (dbData && dbData.levels) {
+    dbData.levels.forEach(lvl => {
+      const points = calculateLevelScore(lvl);
+      if (lvl.victors) {
+        lvl.victors.forEach(v => {
+          const pName = v.name.trim();
+          if (!playerMap[pName]) playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
+          playerMap[pName].totalPoints += points;
+          playerMap[pName].completions.push({
+            levelName: lvl.name,
+            tier: lvl.tier,
+            rank: lvl.rank,
+            pointsEarned: points,
+            proof: v.proof
+          });
+        });
       }
-      loadData();
-    }
+    });
+  }
+  return Object.values(playerMap).sort((a, b) => b.totalPoints - a.totalPoints);
+}
 
-    async function rejectRecord(id) {
-      dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
-      await saveData();
-      loadData();
-    }
+// ==========================================
+// 🖥️ UI INTERFACE RENDERING ENGINE
+// ==========================================
+function renderAll() {
+  renderLevelList();
+  renderLeaderboard();
+  renderSubmissionSelect();
+  renderModPanel();
+}
 
-    function renderModPanel() {
-      if (!isModAuthenticated) return;
-      const q = document.getElementById('approvalsQueueContainer'); 
-      if (!q) return;
-      q.innerHTML = '';
-      dbData.pendingSubmissions.forEach(s => {
-        const lvl = dbData.levels.find(l => l.id === s.levelId);
-        q.innerHTML += `<div class="bg-slate-950 p-2.5 rounded border border-slate-800 text-xs"><div class="flex justify-between"><span><b>${s.playerName}</b> -> ${lvl ? lvl.name : 'Unknown'}</span><a href="${s.videoUrl}" target="_blank" class="text-blue-400">Proof</a></div><div class="flex gap-2 mt-2"><button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-0.5 rounded text-[10px]">Approve</button><button onclick="rejectRecord('${s.id}')" class="bg-slate-800 px-2 py-0.5 rounded text-[10px]">Deny</button></div></div>`;
-      });
-      const matrix = document.getElementById('modDatabaseMatrixBody'); 
-      if (!matrix) return;
-      matrix.innerHTML = '';
-      dbData.levels.forEach(l => {
-        matrix.innerHTML += `<tr class="border-b border-slate-900"><td class="p-2 uppercase text-slate-500 font-mono">${l.tier}</td><td class="p-2 font-bold">#${l.rank}</td><td class="p-2 text-white">${l.name}</td><td class="p-2 text-right"><button onclick="initiateEdit('${l.id}')" class="bg-slate-800 text-white px-2 py-0.5 rounded mr-1">Edit</button><button onclick="deleteLevel('${l.id}')" class="bg-red-950 text-red-400 px-2 py-0.5 rounded">Del</button></td></tr>`;
-      });
-    }
+function renderLevelList() {
+  const container = document.getElementById('levelListContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  if (!dbData || !dbData.levels) return;
+  
+  let filtered = dbData.levels.filter(l => l.tier === currentSubList);
+  if (searchQuery) {
+    filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) || l.creator.toLowerCase().includes(searchQuery));
+  } else {
+    filtered.sort((a, b) => a.rank - b.rank);
+  }
 
-    function initiateEdit(id) {
-      const l = dbData.levels.find(lvl => lvl.id === id); if(!l) return;
-      document.getElementById('editLevelId').value = l.id;
-      document.getElementById('modLevelName').value = l.name;
-      document.getElementById('modLevelCreator').value = l.creator;
-      document.getElementById('modLevelTier').value = l.tier;
-      document.getElementById('modLevelRank').value = l.rank;
-      document.getElementById('modLevelScoreOverride').value = l.scoreOverride || '';
-      document.getElementById('modLevelVideo').value = l.video || '';
-      document.getElementById('modLevelDesc').value = l.description || '';
-      document.getElementById('modLevelVictors').value = JSON.stringify(l.victors || []);
-    }
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800 rounded-xl">No active levels found in this category.</div>`;
+    return;
+  }
 
-    function verifyModPassword() {
-      if (document.getElementById('modPasswordInput').value === 'MHSDL#42') {
-        isModAuthenticated = true;
-        document.getElementById('modAuthView').classList.add('hidden');
-        document.getElementById('modDashboardView').classList.remove('hidden');
-        renderModPanel();
-      } else { alert('Access Denied'); }
-    }
+  filtered.forEach(lvl => {
+    const card = document.createElement('div');
+    card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-slate-700 shadow-md transition-all";
+    card.onclick = () => openLevelDrawer(lvl.id);
+    card.innerHTML = `
+      <div>
+        <span class="text-slate-500 font-bold mr-2">#${lvl.rank}</span>
+        <span class="text-white font-bold">${lvl.name}</span>
+        <p class="text-xs text-slate-400">by ${lvl.creator}</p>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-black text-red-500">${calculateLevelScore(lvl).toFixed(0)} Pts</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
 
-    function lockModPanel() {
-      isModAuthenticated = false;
-      document.getElementById('modAuthView').classList.remove('hidden');
-      document.getElementById('modDashboardView').classList.add('hidden');
-      document.getElementById('modPasswordInput').value = '';
-    }
+function renderLeaderboard() {
+  const tbody = document.getElementById('leaderboardTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  getLeaderboard().forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.className = "cursor-pointer hover:bg-slate-850/40 border-b border-slate-900 transition-colors";
+    tr.onclick = () => openPlayerDrawer(p.name);
+    tr.innerHTML = `
+      <td class="p-3 text-slate-400 font-bold">#${i+1}</td>
+      <td class="p-3 text-white font-semibold hover:text-red-400">${p.name}</td>
+      <td class="p-3 text-right text-emerald-400 font-bold">${p.totalPoints.toFixed(1)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
-    function switchTab(t) {
-      currentTab = t; document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`section-${t}`).classList.remove('hidden');
-      document.querySelectorAll('nav button').forEach(b => b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white");
-      document.getElementById(`tabBtn-${t}`).className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white";
-    }
+function renderSubmissionSelect() {
+  const select = document.getElementById('submitTargetLevel');
+  if (!select) return;
+  select.innerHTML = '';
+  if (dbData && dbData.levels) {
+    dbData.levels.forEach(l => {
+      select.innerHTML += `<option value="${l.id}">${l.name} (${l.tier.toUpperCase()} #${l.rank})</option>`;
+    });
+  }
+}
 
-    function switchSubList(s) {
-      currentSubList = s; document.querySelectorAll('[id^="subListBtn-"]').forEach(b => b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50");
-      document.getElementById(`subListBtn-${s}`).className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700";
-      renderLevelList();
-    }
+// ==========================================
+// 📂 INTERACTIVE SIDE SLIDEOUT DRAWERS
+// ==========================================
+function openLevelDrawer(id) {
+  const lvl = dbData.levels.find(l => l.id === id);
+  if (!lvl) return;
+  
+  document.getElementById('drawerDefaultState').classList.add('hidden');
+  document.getElementById('drawerPlayerState').classList.add('hidden');
+  document.getElementById('drawerLevelState').classList.remove('hidden');
+  
+  document.getElementById('lvlDrawerName').innerText = lvl.name;
+  document.getElementById('lvlDrawerRank').innerText = `#${lvl.rank}`;
+  document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
+  document.getElementById('lvlDrawerTier').innerText = lvl.tier;
+  document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No description provided.";
+  document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
+  
+  const list = document.getElementById('lvlDrawerVictorsList');
+  list.innerHTML = '';
+  if (lvl.victors && lvl.victors.length > 0) {
+    document.getElementById('lvlDrawerVictorsCount').innerText = `${lvl.victors.length} runs`;
+    lvl.victors.forEach(v => {
+      list.innerHTML += `
+        <a href="${v.proof}" target="_blank" class="block bg-slate-950 p-2.5 rounded border border-slate-800 text-xs text-slate-300 hover:text-red-400 flex justify-between items-center transition-all">
+          <span><i class="fa-solid fa-user-check mr-2 text-slate-500"></i>${v.name}</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>`;
+    });
+  } else {
+    document.getElementById('lvlDrawerVictorsCount').innerText = "0 runs";
+    list.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-2">No victors yet.</p>`;
+  }
+}
 
-    function handleSearch(v) { searchQuery = v.toLowerCase().trim(); renderLevelList(); }
+function openPlayerDrawer(name) {
+  const p = getLeaderboard().find(pl => pl.name === name);
+  if (!p) return;
+  
+  document.getElementById('drawerDefaultState').classList.add('hidden');
+  document.getElementById('drawerLevelState').classList.add('hidden');
+  document.getElementById('drawerPlayerState').classList.remove('hidden');
+  
+  document.getElementById('plrDrawerName').innerText = p.name;
+  document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
+  
+  const list = document.getElementById('plrDrawerCompletionsList');
+  list.innerHTML = '';
+  p.completions.forEach(c => {
+    list.innerHTML += `
+      <div class="bg-slate-950 p-3 rounded border border-slate-800/60 text-xs">
+        <div class="flex justify-between font-bold text-white">
+          <span>${c.levelName}</span>
+          <span class="text-emerald-400">+${c.pointsEarned.toFixed(0)}</span>
+        </div>
+        <span class="text-[10px] text-slate-500 uppercase">${c.tier} Position #${c.rank}</span>
+      </div>`;
+  });
+}
 
-    document.addEventListener('DOMContentLoaded', loadData);
+// ==========================================
+// 🛡️ STAFF OPERATIONS & VERIFICATION FORMS
+// ==========================================
+async function handleRecordSubmit(e) {
+  e.preventDefault();
+  if (!dbData.pendingSubmissions) dbData.pendingSubmissions = [];
+  dbData.pendingSubmissions.push({
+    id: "sub-" + Date.now(),
+    playerName: document.getElementById('submitPlayerName').value.trim(),
+    levelId: document.getElementById('submitTargetLevel').value,
+    videoUrl: document.getElementById('submitVideoUrl').value.trim()
+  });
+  
+  await saveData();
+  alert('Record submitted to the cloud review queue.');
+  document.getElementById('recordSubmissionForm').reset();
+  loadData();
+}
+
+async function handleLevelMutation(e) {
+  e.preventDefault();
+  const editId = document.getElementById('editLevelId').value;
+  
+  let victorsParsed = [];
+  const victorsRaw = document.getElementById('modLevelVictors').value.trim();
+  if (victorsRaw) {
+    try { victorsParsed = JSON.parse(victorsRaw); } 
+    catch(err) { alert("Invalid JSON formatting syntax in victors field."); return; }
+  }
+
+  const body = {
+    id: editId || "lvl-" + Date.now(),
+    name: document.getElementById('modLevelName').value.trim(),
+    creator: document.getElementById('modLevelCreator').value.trim(),
+    tier: document.getElementById('modLevelTier').value,
+    rank: parseInt(document.getElementById('modLevelRank').value) || 1,
+scoreOverride: document.getElementById('modLevelScoreOverride').value ? parseFloat(document.getElementById('modLevelScoreOverride').value) : null,
+video: document.getElementById('modLevelVideo').value.trim(),
+description: document.getElementById('modLevelDesc').value.trim(),
+victors: editId && !victorsRaw ? (dbData.levels.find(l => l.id === editId)?.victors || []) : victorsParsed
+};
+if (editId) {
+const idx = dbData.levels.findIndex(l => l.id === editId);
+if (idx !== -1) dbData.levels[idx] = body;
+} else {
+if (!dbData.levels) dbData.levels = [];
+dbData.levels.push(body);
+}
+await saveData();
+document.getElementById('levelMutationForm').reset();
+document.getElementById('editLevelId').value = '';
+loadData();
+alert("Cloud Database updated successfully!");
+}
+async function deleteLevel(id) {
+if (confirm("Permanently wipe this level entry from the cloud database?")) {
+dbData.levels = dbData.levels.filter(l => l.id !== id);
+await saveData();
+loadData();
+}
+}
+async function approveRecord(id) {
+const sub = dbData.pendingSubmissions.find(s => s.id === id);
+if (sub) {
+const lvl = dbData.levels.find(l => l.id === sub.levelId);
+if (lvl) {
+if (!lvl.victors) lvl.victors = [];
+lvl.victors.push({ name: sub.playerName, proof: sub.videoUrl });
+}
+dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
+await saveData();
+}
+loadData();
+}
+async function rejectRecord(id) {
+dbData.pendingSubmissions = dbData.pendingSubmissions.filter(s => s.id !== id);
+await saveData();
+loadData();
+}
+function renderModPanel() {
+if (!isModAuthenticated) return;
+const q = document.getElementById('approvalsQueueContainer');
+if (q) {
+q.innerHTML = '';
+if (!dbData.pendingSubmissions || dbData.pendingSubmissions.length === 0) {
+q.innerHTML = <p class="text-xs text-slate-500 italic text-center py-8">No records pending audit.</p>;
+} else {
+dbData.pendingSubmissions.forEach(s => {
+const lvl = dbData.levels.find(l => l.id === s.levelId);
+q.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800 text-xs"> <div class="flex justify-between mb-2"> <span><b>${s.playerName}</b> verified on <i>${lvl ? lvl.name : 'Unknown'}</i></span> <a href="${s.videoUrl}" target="_blank" class="text-blue-400 hover:underline">Link</a> </div> <div class="flex gap-2"> <button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-1 rounded font-bold text-[10px] text-white">Approve</button> <button onclick="rejectRecord('${s.id}')" class="bg-slate-800 px-2 py-1 rounded text-[10px] text-slate-400">Deny</button> </div> </div>;
+});
+}
+}
+const matrix = document.getElementById('modDatabaseMatrixBody');
+if (matrix && dbData.levels) {
+matrix.innerHTML = '';
+dbData.levels.sort((a,b)=>a.tier.localeCompare(b.tier) || a.rank - b.rank).forEach(l => {
+matrix.innerHTML += `
+${l.tier}
+#${l.rank}
+${l.name}
+`;
+});
+}
+}
+function initiateEdit(id) {
+const l = dbData.levels.find(lvl => lvl.id === id);
+if (!l) return;
+document.getElementById('editLevelId').value = l.id;
+document.getElementById('modLevelName').value = l.name;
+document.getElementById('modLevelCreator').value = l.creator;
+document.getElementById('modLevelTier').value = l.tier;
+document.getElementById('modLevelRank').value = l.rank;
+document.getElementById('modLevelScoreOverride').value = l.scoreOverride || '';
+document.getElementById('modLevelVideo').value = l.video || '';
+document.getElementById('modLevelDesc').value = l.description || '';
+document.getElementById('modLevelVictors').value = JSON.stringify(l.victors || []);
+}
+function verifyModPassword() {
+if (document.getElementById('modPasswordInput').value === 'MHSDL#42') {
+isModAuthenticated = true;
+document.getElementById('modAuthView').classList.add('hidden');
+document.getElementById('modDashboardView').classList.remove('hidden');
+renderModPanel();
+} else { alert('Access Token Invalid'); }
+}
+function lockModPanel() {
+isModAuthenticated = false;
+document.getElementById('modAuthView').classList.remove('hidden');
+document.getElementById('modDashboardView').classList.add('hidden');
+document.getElementById('modPasswordInput').value = '';
+}
+function switchTab(t) {
+currentTab = t;
+document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+document.getElementById(section-${t}).classList.remove('hidden');
+document.querySelectorAll('nav button').forEach(b => b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white");
+document.getElementById(tabBtn-${t}).className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white";
+}
+function switchSubList(s) {
+currentSubList = s;
+document.querySelectorAll('[id^="subListBtn-"]').forEach(b => b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50");
+document.getElementById(subListBtn-${s}).className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700";
+renderLevelList();
+}
+function handleSearch(v) { searchQuery = v.toLowerCase().trim(); renderLevelList(); }
+document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
 </html>
