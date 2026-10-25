@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHSDL - Demon List Platform</title>
+  <!-- Tailwind CSS Engine -->
+  <script src="https://tailwindcss.com"></script>
+  <!-- Icon Packs -->
+  <link rel="stylesheet" href="https://cloudflare.com">
+  <style>
+    @import url('https://googleapis.com');
+    body { font-family: 'Inter', sans-serif; background-color: #080c14; color: #f3f4f6; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-4 shadow-xl">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3 cursor-pointer select-none" onclick="switchTab('lists')">
+        <div class="bg-red-600 text-white px-3 py-1.5 rounded-xl font-black text-xl tracking-wider shadow-lg shadow-red-900/40 animate-pulse">MHSDL</div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight text-white">Demon List Matrix</h1>
+          <p class="text-[11px] text-gray-400">AREDL Progressive Scaling</p>
+        </div>
+      </div>
+      
+      <!-- Global Realtime Search Bar -->
+      <div class="relative w-full md:w-80 lg:w-96">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500">
+          <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        </span>
+        <input type="text" id="globalSearch" oninput="handleSearch(this.value)" placeholder="Filter levels, creators, players..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors">
+      </div>
+
+      <!-- Main Navigation Tab Links -->
+      <nav class="flex items-center bg-slate-950 p-1 border border-slate-800 rounded-xl overflow-x-auto max-w-full custom-scrollbar">
+        <button onclick="switchTab('lists')" id="tabBtn-lists" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all bg-red-600 text-white">Lists</button>
+        <button onclick="switchTab('leaderboard')" id="tabBtn-leaderboard" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white">Leaderboard</button>
+        <button onclick="switchTab('events')" id="tabBtn-events" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white">Events</button>
+        <button onclick="switchTab('submit')" id="tabBtn-submit" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white">Submit Run</button>
+        <button onclick="switchTab('mod')" id="tabBtn-mod" class="px-4 py-1.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all text-slate-400 hover:text-white border border-transparent hover:border-red-900/50"><i class="fa-solid fa-shield-halved text-xs mr-1.5 text-red-500"></i>Mod Panel</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main View Workspace Architecture Container -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- LEFT & MIDDLE DATA COMPARTMENT -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- SUBSECTION: LIST DIRECTORIES -->
+      <section id="section-lists" class="tab-content">
+        <!-- Sub-list categories selector row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 bg-slate-900/40 p-1.5 border border-slate-800 rounded-xl">
+          <button onclick="switchSubList('pemonlist')" id="subListBtn-pemonlist" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all bg-slate-800 text-white border border-slate-700">Pemonlist</button>
+          <button onclick="switchSubList('classic')" id="subListBtn-classic" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:bg-slate-800/50">Classic List</button>
+          <button onclick="switchSubList('legacy')" id="subListBtn-legacy" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:bg-slate-800/50">Legacy List</button>
+          <button onclick="switchSubList('challenge')" id="subListBtn-challenge" class="px-3 py-2 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:bg-slate-800/50">Challenge List</button>
+        </div>
+
+        <!-- Levels List Output Holder -->
+        <div id="levelListContainer" class="space-y-3"></div>
+      </section>
+
+      <!-- SUBSECTION: LEADERBOARDS -->
+      <section id="section-leaderboard" class="tab-content hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div class="mb-6">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-trophy text-amber-500 animate-bounce"></i> Global Player Leaderboard
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Calculated in real-time from verified tier points and completions.</p>
+          </div>
+          
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-sm">
+              <thead class="text-xs uppercase bg-slate-950 border border-slate-800 text-slate-400">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-xl">Rank</th>
+                  <th class="px-4 py-3">Player Identity</th>
+                  <th class="px-4 py-3 text-right rounded-r-xl">Total Points</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardTableBody" class="divide-y divide-slate-800/50"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUBSECTION: CHALLENGE AND LIST EVENTS -->
+      <section id="section-events" class="tab-content hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div class="mb-6">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-calendar-check text-red-500"></i> Active List Operations & Events
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Active community challenges and seasonal milestones.</p>
+          </div>
+          
+          <div class="space-y-4" id="eventsContainer">
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">LIVE</span>
+                <h3 class="text-base font-bold text-white mt-1">MHSDL Global Launch Race</h3>
+                <p class="text-xs text-slate-400 mt-0.5">The first 3 verified victors on any tier placement claim profile honors.</p>
+              </div>
+              <div class="text-xs text-slate-500 whitespace-nowrap">Concludes: Nov 15, 2026</div>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">UPCOMING</span>
+                <h3 class="text-base font-bold text-white mt-1">Challenge List Micro Decay Week</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Short challenge map completions award static baseline value multiplier points.</p>
+              </div>
+              <div class="text-xs text-slate-500 whitespace-nowrap">Commences: Nov 28, 2026</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUBSECTION: USER PUBLIC RECORD SUBMISSIONS -->
+      <section id="section-submit" class="tab-content hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div class="mb-6">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-share-from-square text-emerald-500"></i> Submit Verification Record
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">Fill out player run properties for list panel verification.</p>
+          </div>
+          
+          <form id="recordSubmissionForm" onsubmit="handleRecordSubmit(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Player Identifier</label>
+                <input type="text" id="submitPlayerName" required placeholder="e.g., Zoink" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Target Map Level</label>
+                <select id="submitTargetLevel" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500"></select>
+              </div>
+            </div>
+            <div>
