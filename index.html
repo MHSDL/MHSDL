@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MHSDL - Demon List Platform</title>
   <!-- Tailwind CSS Engine -->
-  <script src="https://tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Icon Packs -->
-  <link rel="stylesheet" href="https://cloudflare.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://googleapis.com');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
     body { font-family: 'Inter', sans-serif; background-color: #080c14; color: #f3f4f6; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
@@ -23,7 +23,7 @@
   <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-4 py-4 shadow-xl">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3 cursor-pointer select-none" onclick="switchTab('lists')">
-        <div class="bg-red-600 text-white px-3 py-1.5 rounded-xl font-black text-xl tracking-wider shadow-lg shadow-red-900/40 animate-pulse">MHSDL</div>
+        <div class="bg-red-600 text-white px-3 py-1.5 rounded-xl font-black text-xl tracking-wider shadow-lg shadow-red-900/40">MHSDL</div>
         <div>
           <h1 class="font-bold text-lg leading-tight text-white">Demon List Matrix</h1>
           <p class="text-[11px] text-gray-400">AREDL Progressive Scaling</p>
@@ -74,7 +74,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
           <div class="mb-6">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-trophy text-amber-500 animate-bounce"></i> Global Player Leaderboard
+              <i class="fa-solid fa-trophy text-amber-500"></i> Global Player Leaderboard
             </h2>
             <p class="text-xs text-slate-400 mt-1">Calculated in real-time from verified tier points and completions.</p>
           </div>
@@ -113,14 +113,6 @@
               </div>
               <div class="text-xs text-slate-500 whitespace-nowrap">Concludes: Nov 15, 2026</div>
             </div>
-            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">UPCOMING</span>
-                <h3 class="text-base font-bold text-white mt-1">Challenge List Micro Decay Week</h3>
-                <p class="text-xs text-slate-400 mt-0.5">Short challenge map completions award static baseline value multiplier points.</p>
-              </div>
-              <div class="text-xs text-slate-500 whitespace-nowrap">Commences: Nov 28, 2026</div>
-            </div>
           </div>
         </div>
       </section>
@@ -147,3 +139,808 @@
               </div>
             </div>
             <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Video Link Verification Proof</label>
+              <input type="url" id="submitVideoUrl" required placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl py-3 tracking-wide shadow-lg transition-colors">Route to Mod Audit Queue</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="section-mod" class="tab-content hidden">
+        <div id="modAuthView" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center max-w-md mx-auto my-8">
+          <div class="bg-red-600/10 border border-red-500/20 text-red-500 w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-xl mb-4">
+            <i class="fa-solid fa-lock bg-transparent"></i>
+          </div>
+          <h2 class="text-xl font-bold text-white mb-1">Staff Access Point</h2>
+          <p class="text-xs text-slate-400 mb-6">Enter system password to decrypt matrix configuration panels.</p>
+          
+          <div class="space-y-3">
+            <input type="password" id="modPasswordInput" placeholder="System Gate Password" class="w-full text-center bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+            <button onclick="verifyModPassword()" class="w-full bg-red-600 hover:bg-red-500 text-white font-semibold text-sm rounded-xl py-2.5 transition-colors">Authenticate Admin Token</button>
+            <p id="authErrorMessage" class="text-xs text-red-400 font-medium hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> Access denied. Tokens mismatch.</p>
+          </div>
+        </div>
+
+        <div id="modDashboardView" class="hidden space-y-6">
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-gears text-red-500"></i> Master Controller Matrix
+              </h2>
+              <p class="text-xs text-slate-400">Dynamic system additions, overrides, map changes and mutations.</p>
+            </div>
+            <button onclick="lockModPanel()" class="bg-slate-950 border border-slate-800 text-slate-400 hover:text-white px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors"><i class="fa-solid fa-power-off mr-2 text-red-500"></i>Lock Dashboard</button>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+            <div class="xl:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+              <h3 id="formActionTitle" class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span> Add Level Schema Node
+              </h3>
+              
+              <form id="levelMutationForm" onsubmit="handleLevelMutation(event)" class="space-y-4">
+                <input type="hidden" id="editLevelId" value="">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Level Name</label>
+                    <input type="text" id="modLevelName" required placeholder="e.g., Tidal Wave" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Author / Creator</label>
+                    <input type="text" id="modLevelCreator" required placeholder="e.g., OniLink" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Target Directory</label>
+                    <select id="modLevelTier" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+                      <option value="pemonlist">Pemonlist</option>
+                      <option value="classic">Classic List</option>
+                      <option value="legacy">Legacy List</option>
+                      <option value="challenge">Challenge List</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">List Target Position</label>
+                    <input type="number" id="modLevelRank" required min="1" placeholder="1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Manual Points Override</label>
+                    <input type="number" id="modLevelScoreOverride" min="0" step="any" placeholder="Auto Engine Calc" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Showcase Clip/Video URL</label>
+                  <input type="url" id="modLevelVideo" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Context Summary</label>
+                  <textarea id="modLevelDesc" rows="2" placeholder="Brief history data regarding verification process steps..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-red-500 custom-scrollbar"></textarea>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 mb-1">Victors Matrix Set (JSON Object Format Array)</label>
+                  <textarea id="modLevelVictors" rows="2" placeholder='[{"name": "PlayerName", "proof": "https://video-url"}]' class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 font-mono text-xs text-emerald-400 focus:outline-none focus:border-red-500 custom-scrollbar"></textarea>
+                </div>
+
+                <div class="flex gap-2">
+                  <button type="submit" id="formSubmitBtn" class="flex-grow bg-red-600 hover:bg-red-500 text-white font-semibold text-xs rounded-xl py-2.5 transition-colors">Commit Entry Patch</button>
+                  <button type="button" id="formCancelBtn" onclick="resetMutationForm()" class="hidden bg-slate-950 border border-slate-800 text-slate-400 hover:text-white font-semibold text-xs rounded-xl px-4 py-2.5 transition-colors">Abort</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="xl:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[510px]">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-hourglass text-amber-500"></i> Records Audit Queue
+              </h3>
+              <div id="approvalsQueueContainer" class="flex-grow overflow-y-auto custom-scrollbar space-y-3 pr-1"></div>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Complete Live Database Entries Matrix</h3>
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950 border border-slate-800 text-slate-400 uppercase">
+                  <tr>
+                    <th class="px-4 py-2.5 rounded-l-lg">Tier</th>
+                    <th class="px-4 py-2.5">Pos</th>
+                    <th class="px-4 py-2.5">Level Name</th>
+                    <th class="px-4 py-2.5">Creator Authority</th>
+                    <th class="px-4 py-2.5 text-right rounded-r-lg">Mod Operation Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="modDatabaseMatrixBody" class="divide-y divide-slate-800/40"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT DRAWER FRAMEWORK -->
+    <div class="lg:col-span-1">
+      <div id="interactiveDrawerContainer" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sticky top-28 shadow-xl min-h-[400px] flex flex-col justify-between">
+        
+        <div id="drawerDefaultState" class="text-center py-20 my-auto">
+          <div class="text-slate-700 text-5xl mb-4"><i class="fa-solid fa-folder-open"></i></div>
+          <h3 class="text-sm font-bold text-slate-400">No Target Active</h3>
+          <p class="text-xs text-slate-500 max-w-[220px] mx-auto mt-2">Select a level entry node or leaderboard profile to inspect context properties instantly.</p>
+        </div>
+
+        <div id="drawerLevelState" class="hidden flex-col h-full space-y-5 flex-grow">
+          <div class="border-b border-slate-800 pb-4 flex justify-between items-start gap-4">
+            <div>
+              <span id="lvlDrawerTier" class="bg-red-500/10 text-red-400 border border-red-500/20 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded">CLASSIC</span>
+              <h2 id="lvlDrawerName" class="text-2xl font-black text-white tracking-tight mt-1">Level</h2>
+              <p class="text-xs text-slate-400 mt-0.5">By <span id="lvlDrawerCreator" class="text-slate-300 font-medium">Author</span></p>
+            </div>
+            <div class="text-right">
+              <div id="lvlDrawerRank" class="text-2xl font-black text-red-500">#0</div>
+              <div id="lvlDrawerPoints" class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">0 PTS</div>
+            </div>
+          </div>
+
+          <div id="lvlDrawerVideoWrapper" class="bg-slate-950 rounded-xl overflow-hidden aspect-video border border-slate-800 flex items-center justify-center relative">
+            <a id="lvlDrawerVideoBtn" href="#" target="_blank" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/90 hover:bg-slate-950/70 text-white transition-all group">
+              <i class="fa-brands fa-youtube text-red-600 text-4xl group-hover:scale-110 transition-transform"></i>
+              <span class="text-xs font-semibold tracking-wide mt-2 opacity-80 group-hover:opacity-100">Launch Showcase Proof</span>
+            </a>
+          </div>
+
+          <div class="space-y-1">
+            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">Context Summary</h4>
+            <p id="lvlDrawerDesc" class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed"></p>
+          </div>
+
+          <div class="space-y-2 flex-grow flex flex-col">
+            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex justify-between items-center">
+              <span>Verified Running Victors</span>
+              <span id="lvlDrawerVictorsCount" class="text-slate-500 font-normal">0 runs</span>
+            </h4>
+            <div id="lvlDrawerVictorsList" class="space-y-1.5 overflow-y-auto max-h-[180px] custom-scrollbar pr-1 flex-grow"></div>
+          </div>
+        </div>
+
+        <div id="drawerPlayerState" class="hidden flex-col h-full space-y-5 flex-grow">
+          <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="plrDrawerName" class="text-xl font-bold text-white tracking-tight">Player</h2>
+                <span id="plrDrawerBadge" class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded">Badge</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">Platform Status Position: <span id="plrDrawerRank" class="text-slate-200 font-semibold">#0</span></p>
+            </div>
+            <div class="text-right bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
+              <div id="plrDrawerPoints" class="text-lg font-black text-emerald-400 leading-none">0.00</div>
+              <span class="text-[9px] text-slate-500 uppercase tracking-wider font-bold">Aggregate Score</span>
+            </div>
+          </div>
+
+          <div class="flex-grow flex flex-col space-y-2">
+            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">Verified Completed Map Manifest</h4>
+            <div id="plrDrawerCompletionsList" class="space-y-2 overflow-y-auto max-h-[320px] custom-scrollbar pr-1 flex-grow"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-900 mt-auto py-6 text-center text-xs text-slate-500">
+    <div>&copy; 2026 MHSDL Demon List network architecture. Derived from AREDL core engines.</div>
+  </footer>
+
+  <script>
+    // Default system seed values
+    const DEFAULT_LEVELS = [
+      {
+        id: "lvl-1",
+        name: "Acheron",
+        creator: "Riot & More",
+        tier: "pemonlist",
+        rank: 1,
+        scoreOverride: null,
+        description: "Regarded as one of the most punishing and tightly optimized mechanical maps in existence.",
+        video: "https://www.youtube.com/watch?v=e96vT_tHoxY",
+        victors: [
+          { name: "wPopoff", proof: "https://www.youtube.com/watch?v=e96vT_tHoxY" },
+          { name: "Trick", proof: "https://www.youtube.com/watch?v=k8v5Xw86VpI" }
+        ]
+      },
+      {
+        id: "lvl-2",
+        name: "Bloodbath",
+        creator: "Riot",
+        tier: "classic",
+        rank: 1,
+        scoreOverride: null,
+        description: "The historical titan of extreme demons. A legendary megacollab that defined an entire era.",
+        video: "https://www.youtube.com/watch?v=26I-f6V7Lxs",
+        victors: [
+          { name: "Trick", proof: "https://www.youtube.com/watch?v=pDIn9m-jM3E" },
+          { name: "Zoink", proof: "https://www.youtube.com/watch?v=Yf9pM3n5Ias" },
+          { name: "Diamond", proof: "https://www.youtube.com/watch?v=S9k2y_2mE68" }
+        ]
+      },
+      {
+        id: "lvl-3",
+        name: "Sonic Wave",
+        creator: "Sunix",
+        tier: "classic",
+        rank: 2,
+        scoreOverride: null,
+        description: "Legendary modern wave-heavy endurance blueprint variant.",
+        video: "https://www.youtube.com/watch?v=Pofb6p-p1lI",
+        victors: [
+          { name: "Zoink", proof: "https://www.youtube.com/watch?v=Yf9pM3n5Ias" },
+          { name: "wPopoff", proof: "https://www.youtube.com/watch?v=e96vT_tHoxY" }
+        ]
+      },
+      {
+        id: "lvl-4",
+        name: "Cataclysm",
+        creator: "Gboy",
+        tier: "legacy",
+        rank: 1,
+        scoreOverride: null,
+        description: "The old-school introductory gateway trial level to hell extreme demons.",
+        video: "https://www.youtube.com/watch?v=8476839",
+        victors: [
+          { name: "Diamond", proof: "https://www.youtube.com/watch?v=S9k2y_2mE68" }
+        ]
+      },
+      {
+        id: "lvl-5",
+        name: "VSC Corridor V3",
+        creator: "Bo",
+        tier: "challenge",
+        rank: 1,
+        scoreOverride: null,
+        description: "Absurdly frame perfect click sequencing challenge testing the raw boundary threshold.",
+        video: "https://www.youtube.com/watch?v=38309485",
+        victors: [
+          { name: "Trick", proof: "https://www.youtube.com/watch?v=k8v5Xw86VpI" }
+        ]
+      }
+    ];
+
+    // LocalStorage Persistent Database Binding Handlers
+    let levels = [];
+    let pendingSubmissions = [];
+
+    function loadDatabase() {
+      const storedLevels = localStorage.getItem('MHSDL_levels');
+      if (storedLevels) {
+        levels = JSON.parse(storedLevels);
+      } else {
+        levels = [...DEFAULT_LEVELS];
+        saveDatabase();
+      }
+
+      const storedSubs = localStorage.getItem('MHSDL_pending');
+      if (storedSubs) {
+        pendingSubmissions = JSON.parse(storedSubs);
+      } else {
+        pendingSubmissions = [
+          {
+            id: "sub-1",
+            playerName: "Cursed",
+            levelId: "lvl-2",
+            videoUrl: "https://www.youtube.com/watch?v=26I-f6V7Lxs"
+          }
+        ];
+        saveDatabase();
+      }
+    }
+
+    function saveDatabase() {
+      localStorage.setItem('MHSDL_levels', JSON.stringify(levels));
+      localStorage.setItem('MHSDL_pending', JSON.stringify(pendingSubmissions));
+    }
+
+    let currentTab = 'lists';
+    let currentSubList = 'pemonlist';
+    let isModAuthenticated = false;
+    let searchQuery = '';
+
+    // Core Progressive Point Logic Processing System Routine
+    function calculateLevelScore(level) {
+      if (level.scoreOverride !== null && level.scoreOverride !== undefined && level.scoreOverride !== '') {
+        return parseFloat(level.scoreOverride);
+      }
+
+      const r = parseInt(level.rank) || 1;
+      
+      switch (level.tier) {
+        case 'pemonlist':
+          return Math.max(600 - (r - 1) * 25, 100);
+          
+        case 'classic':
+          let score = 500;
+          for (let i = 1; i < r; i++) {
+            if (score > 400) {
+              score -= 20;
+            } else {
+              score -= 3;
+            }
+          }
+          return Math.max(score, 5);
+          
+        case 'legacy':
+          return Math.max(50 - (r - 1) * 2, 5);
+          
+        case 'challenge':
+          return Math.max(150 - (r - 1) * 10, 10);
+          
+        default:
+          return 0;
+      }
+    }
+
+    function getLeaderboard() {
+      let playerMap = {};
+
+      levels.forEach(lvl => {
+        const pointsWorth = calculateLevelScore(lvl);
+        if (lvl.victors && Array.isArray(lvl.victors)) {
+          lvl.victors.forEach(v => {
+            if (!v.name) return;
+            const pName = v.name.trim();
+            if (!playerMap[pName]) {
+              playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
+            }
+            playerMap[pName].totalPoints += pointsWorth;
+            playerMap[pName].completions.push({
+              levelId: lvl.id,
+              levelName: lvl.name,
+              tier: lvl.tier,
+              rank: lvl.rank,
+              pointsEarned: pointsWorth,
+              proof: v.proof || "#"
+            });
+          });
+        }
+      });
+
+      return Object.values(playerMap).sort((a, b) => b.totalPoints - a.totalPoints);
+    }
+
+    function renderAll() {
+      renderLevelList();
+      renderLeaderboard();
+      renderSubmissionSelect();
+      renderModPanel();
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`section-${tabId}`).classList.remove('hidden');
+
+      document.querySelectorAll('nav button').forEach(btn => {
+        btn.classList.remove('bg-red-600', 'text-white');
+        btn.classList.add('text-slate-400', 'hover:text-white');
+      });
+      const activeBtn = document.getElementById(`tabBtn-${tabId}`);
+      activeBtn.classList.remove('text-slate-400', 'hover:text-white');
+      activeBtn.classList.add('bg-red-600', 'text-white');
+    }
+
+    function switchSubList(subListKey) {
+      currentSubList = subListKey;
+      document.querySelectorAll('[id^="subListBtn-"]').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white', 'border', 'border-slate-700');
+        btn.classList.add('text-slate-400', 'hover:bg-slate-800/50');
+      });
+      const activeBtn = document.getElementById(`subListBtn-${subListKey}`);
+      activeBtn.classList.remove('text-slate-400', 'hover:bg-slate-800/50');
+      activeBtn.classList.add('bg-slate-800', 'text-white', 'border', 'border-slate-700');
+      
+      renderLevelList();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.toLowerCase().trim();
+      renderAll();
+    }
+
+    function renderLevelList() {
+      const container = document.getElementById('levelListContainer');
+      container.innerHTML = '';
+
+      let filtered = levels.filter(l => l.tier === currentSubList);
+      
+      if (searchQuery) {
+        filtered = levels.filter(l => 
+          l.name.toLowerCase().includes(searchQuery) ||
+          l.creator.toLowerCase().includes(searchQuery) ||
+          l.tier.toLowerCase().includes(searchQuery)
+        );
+      } else {
+        filtered.sort((a, b) => a.rank - b.rank);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800/60 rounded-xl">No database levels located matching criteria parameters.</div>`;
+        return;
+      }
+
+      filtered.forEach(lvl => {
+        const score = calculateLevelScore(lvl);
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 rounded-xl p-4 flex items-center justify-between gap-4 cursor-pointer transition-all shadow-md";
+        card.setAttribute('onclick', `openLevelDrawer("${lvl.id}")`);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-4">
+            <div class="font-black text-base text-slate-500 w-8 text-center">#${lvl.rank}</div>
+            <div>
+              <h3 class="font-bold text-white text-base tracking-tight">${lvl.name}</h3>
+              <p class="text-xs text-slate-400">by ${lvl.creator} <span class="ml-2 text-[9px] uppercase font-black text-slate-600">${lvl.tier}</span></p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs font-black text-red-500">${score.toFixed(0)} Pts</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">${lvl.victors ? lvl.victors.length : 0} Victors</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboardTableBody');
+      tbody.innerHTML = '';
+
+      const leaderboardData = getLeaderboard();
+      let displayData = leaderboardData;
+      
+      if (searchQuery) {
+        displayData = leaderboardData.filter(p => p.name.toLowerCase().includes(searchQuery));
+      }
+
+      if (displayData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-8 text-xs text-slate-500">No profile indexes registered.</td></tr>`;
+        return;
+      }
+
+      displayData.forEach((player) => {
+        const globalRank = leaderboardData.findIndex(p => p.name === player.name) + 1;
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-850/40 cursor-pointer transition-colors border-b border-slate-900";
+        row.setAttribute('onclick', `openPlayerDrawer("${player.name}")`);
+
+        row.innerHTML = `
+          <td class="px-4 py-3.5 font-bold text-slate-400">#${globalRank}</td>
+          <td class="px-4 py-3.5 font-semibold text-white hover:text-red-400 transition-colors">${player.name}</td>
+          <td class="px-4 py-3.5 text-right font-bold text-emerald-400">${player.totalPoints.toFixed(1)}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderSubmissionSelect() {
+      const select = document.getElementById('submitTargetLevel');
+      if (!select) return;
+      select.innerHTML = '';
+      
+      let sortedLevels = [...levels].sort((a,b) => a.name.localeCompare(b.name));
+      sortedLevels.forEach(l => {
+        const opt = document.createElement('option');
+        opt.value = l.id;
+        opt.innerText = `${l.name} (${l.tier.toUpperCase()} #${l.rank})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function hideAllDrawerStates() {
+      document.getElementById('drawerDefaultState').classList.add('hidden');
+      document.getElementById('drawerLevelState').classList.add('hidden');
+      document.getElementById('drawerPlayerState').classList.add('hidden');
+    }
+
+    function openLevelDrawer(lvlId) {
+      const lvl = levels.find(l => l.id === lvlId);
+      if (!lvl) return;
+
+      hideAllDrawerStates();
+      document.getElementById('drawerLevelState').classList.remove('hidden');
+
+      document.getElementById('lvlDrawerTier').innerText = lvl.tier.toUpperCase();
+      document.getElementById('lvlDrawerName').innerText = lvl.name;
+      document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
+      document.getElementById('lvlDrawerRank').innerText = `#${lvl.rank}`;
+      document.getElementById('lvlDrawerPoints').innerText = `${calculateLevelScore(lvl).toFixed(0)} PTS`;
+      document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No description brief compiled for this entry segment.";
+
+      const videoBtn = document.getElementById('lvlDrawerVideoBtn');
+      if (lvl.video) {
+        document.getElementById('lvlDrawerVideoWrapper').classList.remove('hidden');
+        videoBtn.href = lvl.video;
+      } else {
+        document.getElementById('lvlDrawerVideoWrapper').classList.add('hidden');
+      }
+
+      const listContainer = document.getElementById('lvlDrawerVictorsList');
+      listContainer.innerHTML = '';
+      document.getElementById('lvlDrawerVictorsCount').innerText = `${lvl.victors ? lvl.victors.length : 0} runs`;
+
+      if (lvl.victors && lvl.victors.length > 0) {
+        lvl.victors.forEach(v => {
+          const btn = document.createElement('a');
+          btn.href = v.proof || "#";
+          btn.target = "_blank";
+          btn.className = "flex items-center justify-between bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-red-900/50 p-2.5 rounded-xl text-xs text-slate-300 hover:text-white transition-all group";
+          btn.innerHTML = `
+            <span class="font-medium group-hover:text-red-400 transition-colors"><i class="fa-solid fa-user-check text-[10px] mr-2 text-slate-500 group-hover:text-red-400"></i>${v.name}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-600 group-hover:text-red-400"></i>
+          `;
+          listContainer.appendChild(btn);
+        });
+      } else {
+        listContainer.innerHTML = `<p class="text-[11px] text-slate-500 italic text-center py-4">Zero verified records found for this slot.</p>`;
+      }
+    }
+
+    function openPlayerDrawer(playerName) {
+      const leaderboard = getLeaderboard();
+      const player = leaderboard.find(p => p.name.toLowerCase() === playerName.toLowerCase().trim());
+      if (!player) return;
+
+      hideAllDrawerStates();
+      document.getElementById('drawerPlayerState').classList.remove('hidden');
+
+      const rankPos = leaderboard.findIndex(p => p.name === player.name) + 1;
+
+      document.getElementById('plrDrawerName').innerText = player.name;
+      document.getElementById('plrDrawerRank').innerText = `#${rankPos}`;
+      document.getElementById('plrDrawerPoints').innerText = player.totalPoints.toFixed(1);
+      
+      const badge = document.getElementById('plrDrawerBadge');
+      if (rankPos === 1) {
+        badge.innerText = "Champion";
+        badge.className = "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-[9px] font-bold uppercase px-1.5 py-0.5 rounded";
+      } else if (rankPos <= 10) {
+        badge.innerText = "Top 10 Elite";
+        badge.className = "bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px] font-bold uppercase px-1.5 py-0.5 rounded";
+      } else {
+        badge.innerText = "List Contender";
+        badge.className = "bg-slate-800 text-slate-400 text-[9px] font-bold uppercase px-1.5 py-0.5 rounded";
+      }
+
+      const listContainer = document.getElementById('plrDrawerCompletionsList');
+      listContainer.innerHTML = '';
+
+      player.completions.sort((a,b) => b.pointsEarned - a.pointsEarned).forEach(comp => {
+        const item = document.createElement('a');
+        item.href = comp.proof || "#";
+        item.target = "_blank";
+        item.className = "block bg-slate-950 hover:bg-slate-900 border border-slate-800/80 hover:border-emerald-900/50 p-3 rounded-xl transition-all group text-left";
+        
+        item.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <h5 class="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors">${comp.levelName}</h5>
+              <p class="text-[10px] text-slate-500 uppercase font-semibold mt-0.5">${comp.tier} Row Spot #${comp.rank}</p>
+            </div>
+            <span class="text-xs font-mono font-bold text-emerald-400">+${comp.pointsEarned.toFixed(0)}</span>
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function handleRecordSubmit(e) {
+      e.preventDefault();
+      const playerName = document.getElementById('submitPlayerName').value.trim();
+      const levelId = document.getElementById('submitTargetLevel').value;
+      const videoUrl = document.getElementById('submitVideoUrl').value.trim();
+
+      if (!playerName || !levelId || !videoUrl) return;
+
+      pendingSubmissions.push({
+        id: "sub-" + Date.now(),
+        playerName,
+        levelId,
+        videoUrl
+      });
+
+      saveDatabase();
+      alert("Record dispatched onto admin authentication routing stream queues.");
+      document.getElementById('recordSubmissionForm').reset();
+      renderModPanel();
+      switchTab('lists');
+    }
+
+    function verifyModPassword() {
+      const input = document.getElementById('modPasswordInput').value;
+      if (input === 'MHSDL#42') {
+        isModAuthenticated = true;
+        document.getElementById('modAuthView').classList.add('hidden');
+        document.getElementById('modDashboardView').classList.remove('hidden');
+        document.getElementById('authErrorMessage').classList.add('hidden');
+        renderModPanel();
+      } else {
+        document.getElementById('authErrorMessage').classList.remove('hidden');
+      }
+    }
+
+    function lockModPanel() {
+      isModAuthenticated = false;
+      document.getElementById('modPasswordInput').value = '';
+      document.getElementById('modAuthView').classList.remove('hidden');
+      document.getElementById('modDashboardView').classList.add('hidden');
+    }
+
+    function renderModPanel() {
+      if (!isModAuthenticated) return;
+
+      const queueContainer = document.getElementById('approvalsQueueContainer');
+      queueContainer.innerHTML = '';
+
+      if (pendingSubmissions.length === 0) {
+        queueContainer.innerHTML = `<div class="text-center py-20 text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl h-full flex flex-col items-center justify-center my-auto"><i class="fa-solid fa-clipboard-check text-2xl mb-2 text-slate-700"></i>Queue is totally empty.</div>`;
+      } else {
+        pendingSubmissions.forEach(sub => {
+          const matchedLvl = levels.find(l => l.id === sub.levelId);
+          const lvlName = matchedLvl ? matchedLvl.name : "Unknown Level Reference";
+          
+          const card = document.createElement('div');
+          card.className = "bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 text-xs";
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-slate-500">Player:</span> <span class="text-white font-bold">${sub.playerName}</span>
+                <br>
+                <span class="text-slate-500">Map Target:</span> <span class="text-red-400 font-bold">${lvlName}</span>
+              </div>
+              <a href="${sub.videoUrl}" target="_blank" class="text-blue-400 hover:underline text-[10px] font-semibold whitespace-nowrap"><i class="fa-solid fa-up-right-from-square mr-1"></i>Watch Proof</a>
+            </div>
+            <div class="flex gap-2 pt-1">
+              <button onclick="approveRecord('${sub.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1 rounded transition-colors text-[10px]">Approve</button>
+              <button onclick="rejectRecord('${sub.id}')" class="flex-1 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white py-1 rounded transition-colors text-[10px]">Deny</button>
+            </div>
+          `;
+          queueContainer.appendChild(card);
+        });
+      }
+
+      const matrixBody = document.getElementById('modDatabaseMatrixBody');
+      matrixBody.innerHTML = '';
+
+      let matrixList = [...levels].sort((a,b) => a.tier.localeCompare(b.tier) || a.rank - b.rank);
+      matrixList.forEach(lvl => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-850/40 border-b border-slate-800/60";
+        tr.innerHTML = `
+          <td class="px-4 py-2 text-slate-400 font-mono text-[10px] uppercase">${lvl.tier}</td>
+          <td class="px-4 py-2 font-bold text-white">#${lvl.rank}</td>
+          <td class="px-4 py-2 font-semibold text-slate-200">${lvl.name}</td>
+          <td class="px-4 py-2 text-slate-400">${lvl.creator}</td>
+          <td class="px-4 py-2 text-right space-x-1 whitespace-nowrap">
+            <button onclick="initiateEditLevel('${lvl.id}')" class="bg-slate-800 hover:bg-slate-700 text-gray-200 p-1.5 rounded transition-colors text-xs"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteLevel('${lvl.id}')" class="bg-red-950/40 border border-red-900/30 text-red-400 hover:bg-red-900/50 p-1.5 rounded transition-colors text-xs"><i class="fa-solid fa-trash-can"></i></button>
+          </td>
+        `;
+        matrixBody.appendChild(tr);
+      });
+    }
+
+    function approveRecord(subId) {
+      const sub = pendingSubmissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      const lvl = levels.find(l => l.id === sub.levelId);
+      if (lvl) {
+        if (!lvl.victors) lvl.victors = [];
+        lvl.victors.push({ name: sub.playerName, proof: sub.videoUrl });
+      }
+
+      pendingSubmissions = pendingSubmissions.filter(s => s.id !== subId);
+      saveDatabase();
+      renderAll();
+    }
+
+    function rejectRecord(subId) {
+      pendingSubmissions = pendingSubmissions.filter(s => s.id !== subId);
+      saveDatabase();
+      renderAll();
+    }
+
+    function handleLevelMutation(e) {
+      e.preventDefault();
+      
+      const idInput = document.getElementById('editLevelId').value;
+      const name = document.getElementById('modLevelName').value.trim();
+      const creator = document.getElementById('modLevelCreator').value.trim();
+      const tier = document.getElementById('modLevelTier').value;
+      const rank = parseInt(document.getElementById('modLevelRank').value) || 1;
+      const scoreOverride = document.getElementById('modLevelScoreOverride').value;
+      const video = document.getElementById('modLevelVideo').value.trim();
+      const description = document.getElementById('modLevelDesc').value.trim();
+      const victorsJsonStr = document.getElementById('modLevelVictors').value.trim();
+
+      let victorsParsed = [];
+      if (victorsJsonStr) {
+        try {
+          victorsParsed = JSON.parse(victorsJsonStr);
+        } catch(err) {
+          alert("Invalid array composition format setup compiled in JSON parameter entry.");
+          return;
+        }
+      }
+
+      if (idInput) {
+        const idx = levels.findIndex(l => l.id === idInput);
+        if (idx !== -1) {
+          levels[idx] = {
+            ...levels[idx],
+            name, creator, tier, rank, description, video,
+            scoreOverride: scoreOverride !== '' ? parseFloat(scoreOverride) : null,
+            victors: victorsJsonStr ? victorsParsed : levels[idx].victors
+          };
+        }
+      } else {
+        levels.push({
+          id: "lvl-" + Date.now(),
+          name, creator, tier, rank, description, video,
+          scoreOverride: scoreOverride !== '' ? parseFloat(scoreOverride) : null,
+          victors: victorsParsed
+        });
+      }
+
+      saveDatabase();
+      resetMutationForm();
+      renderAll();
+    }
+
+    function initiateEditLevel(lvlId) {
+      const lvl = levels.find(l => l.id === lvlId);
+      if (!lvl) return;
+
+      document.getElementById('editLevelId').value = lvl.id;
+      document.getElementById('modLevelName').value = lvl.name;
+      document.getElementById('modLevelCreator').value = lvl.creator;
+      document.getElementById('modLevelTier').value = lvl.tier;
+      document.getElementById('modLevelRank').value = lvl.rank;
+      document.getElementById('modLevelScoreOverride').value = lvl.scoreOverride !== null ? lvl.scoreOverride : '';
+      document.getElementById('modLevelVideo').value = lvl.video || '';
+      document.getElementById('modLevelDesc').value = lvl.description || '';
+      document.getElementById('modLevelVictors').value = JSON.stringify(lvl.victors || []);
+
+      document.getElementById('formActionTitle').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span> Modifying Schema Profile: ${lvl.name}`;
+      document.getElementById('formSubmitBtn').innerText = "Apply Updates";
+      document.getElementById('formCancelBtn').classList.remove('hidden');
+    }
+
+    function resetMutationForm() {
+      document.getElementById('levelMutationForm').reset();
+      document.getElementById('editLevelId').value = '';
+      document.getElementById('formActionTitle').innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-red-500"></span> Add Level Schema Node`;
+      document.getElementById('formSubmitBtn').innerText = "Commit Entry Patch";
+      document.getElementById('formCancelBtn').classList.add('hidden');
+    }
+
+    function deleteLevel(lvlId) {
+      if (confirm("Confirm database row purging action? This cannot be undone.")) {
+        levels = levels.filter(l => l.id !== lvlId);
+        saveDatabase();
+        renderAll();
+      }
+    }
+
+    // Fire application engine configurations loop on sequence entry loading completion
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDatabase();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
