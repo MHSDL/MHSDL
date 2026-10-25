@@ -151,13 +151,13 @@
   </footer>
 
   <script>
+// Directly wired to your private cloud data container
 const CLOUD_DB_URL = 'jsonbin.io';
 let dbData = { levels: [], pendingSubmissions: [] };
 let currentTab = 'lists';
 let currentSubList = 'pemonlist';
 let isModAuthenticated = false;
 let searchQuery = '';
-// Independent UI Switching Logic Engine Loops (Safe From Empty State Data Dependencies)
 function switchTab(tabId) {
 currentTab = tabId;
 document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -178,7 +178,6 @@ const activeBtn = document.getElementById(subListBtn-${subListId});
 if (activeBtn) activeBtn.className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 transition-all";
 renderLevelList();
 }
-// Network Sync Blocks
 async function loadData() {
 try {
 const res = await fetch(CLOUD_DB_URL);
@@ -191,7 +190,7 @@ dbData.pendingSubmissions = rawData.pendingSubmissions || [];
 }
 renderAll();
 } catch (err) {
-console.error("Database initialization fault, keeping state isolated context profiles:", err);
+console.error("Database sync configuration error:", err);
 renderAll();
 }
 }
@@ -203,10 +202,9 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify(dbData)
 });
 } catch (err) {
-console.error("Failed to commit changes out to the network stream channel node:", err);
+console.error("Failed to update cloud network server node:", err);
 }
 }
-// Mathematical Rules
 function calculateLevelScore(level) {
 if (level.scoreOverride) return parseFloat(level.scoreOverride);
 const r = parseInt(level.rank) || 1;
@@ -238,7 +236,6 @@ playerMap[pName].completions.push({ levelName: lvl.name, tier: lvl.tier, rank: l
 }
 return Object.values(playerMap).sort((a,b) => b.totalPoints - a.totalPoints);
 }
-// Dynamic Level Lists Matrix Outputs
 function renderLevelList() {
 const container = document.getElementById('levelListContainer');
 if (!container) return;
@@ -251,7 +248,7 @@ filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) 
 filtered.sort((a,b) => a.rank - b.rank);
 }
 if (filtered.length === 0) {
-container.innerHTML = <div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800 rounded-xl">No entries live inside this category segment.</div>;
+container.innerHTML = <div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800 rounded-xl">No entries live inside this tier section.</div>;
 return;
 }
 filtered.forEach(lvl => {
@@ -268,7 +265,7 @@ if (!tbody) return;
 tbody.innerHTML = '';
 const ranks = getLeaderboard();
 if (ranks.length === 0) {
-tbody.innerHTML = <tr><td colspan="3" class="p-4 text-center text-xs text-slate-500">Leaderboard index registry completely clear.</td></tr>;
+tbody.innerHTML = <tr><td colspan="3" class="p-4 text-center text-xs text-slate-500">Leaderboard empty.</td></tr>;
 return;
 }
 ranks.forEach((p, i) => {
@@ -289,7 +286,6 @@ select.innerHTML += <option value="${l.id}">${l.name} (${l.tier.toUpperCase()} #
 });
 }
 }
-// Drawer Inspector Toggles
 function openLevelDrawer(id) {
 const lvl = dbData.levels.find(l => l.id === id);
 if (!lvl) return;
@@ -301,7 +297,7 @@ document.getElementById('lvlDrawerRank').innerText = #${lvl.rank};
 document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
 document.getElementById('lvlDrawerTier').innerText = lvl.tier;
 document.getElementById('lvlDrawerPoints').innerText = ${calculateLevelScore(lvl).toFixed(0)} PTS;
-document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No specific brief documentation summary recorded.";
+document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No specific brief summary details recorded.";
 document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
 const list = document.getElementById('lvlDrawerVictorsList');
 list.innerHTML = '';
@@ -326,55 +322,9 @@ document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
 const list = document.getElementById('plrDrawerCompletionsList');
 list.innerHTML = '';
 p.completions.sort((a,b)=>b.pointsEarned - a.pointsEarned).forEach(c => {
-list.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800/80 text-xs"> <div class="flex justify-between font-bold text-white mb-0.5"> <span>${c.levelName}</span> <span class="text-emerald-400 font-mono">+${c.pointsEarned.toFixed(0)}</span> </div> <span class="text-[10px] text-slate-500 uppercase font-medium">${c.tier} Position Rank #${c.rank}</span> </div>;
+list.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800/80 text-xs"> <div class="flex justify-between font-bold text-white mb-0.5"> <span>${c.levelName}</span> <span class="text-emerald-400 font-mono">+${c.pointsEarned.toFixed(0)}</span> </div> <span class="text-[10px] text-slate-500 uppercase font-medium">${c.tier} Position #${c.rank}</span> </div>;
 });
 }
-
-    // ==========================================
-// 🧭 CORE NAVIGATION TAB SWITCHING ENGINES
-// ==========================================
-
-// Handles clicking the main top header menu buttons (Lists, Leaderboard, Mod Panel, etc.)
-function switchTab(tabId) {
-  // Update system tracking state
-  currentTab = tabId;
-  
-  // Hide all panel pages on the screen instantly
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  
-  // Find the exact tab page clicked and reveal it safely
-  const targetSection = document.getElementById(`section-${tabId}`);
-  if (targetSection) targetSection.classList.remove('hidden');
-  
-  // Reset all nav button aesthetics to grey inactive styles
-  document.querySelectorAll('#mainNavTabs button').forEach(b => {
-    b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all";
-  });
-  
-  // Highlight the clicked active button with a clear red focus badge
-  const activeBtn = document.getElementById(`tabBtn-${tabId}`);
-  if (activeBtn) activeBtn.className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white transition-all";
-}
-
-// Handles clicking the level tier filters row (Pemonlist, Classic List, Legacy, Challenge)
-function switchSubList(subListId) {
-  // Update layout pointer state tracking variable
-  currentSubList = subListId;
-  
-  // Reset row sub-toggles styles cleanly to clear background layouts
-  document.querySelectorAll('#subListTabRow button').forEach(b => {
-    b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50 transition-all";
-  });
-  
-  // Highlight the target tier sub-button with an active border highlight focus card
-  const activeBtn = document.getElementById(`subListBtn-${subListId}`);
-  if (activeBtn) activeBtn.className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 transition-all";
-  
-  // Re-run filter maps query to dynamically display levels matching the target category choice
-  renderLevelList();
-}
-
-// Submission Actions
 async function handleRecordSubmit(e) {
 e.preventDefault();
 if (!dbData.pendingSubmissions) dbData.pendingSubmissions = [];
@@ -385,7 +335,7 @@ levelId: document.getElementById('submitTargetLevel').value,
 videoUrl: document.getElementById('submitVideoUrl').value.trim()
 });
 await saveData();
-alert('Record run sent into the cloud verification audit loop queue!');
+alert('Record sent into the shared database audit queue!');
 document.getElementById('recordSubmissionForm').reset();
 loadData();
 }
@@ -396,7 +346,7 @@ let victorsParsed = [];
 const victorsRaw = document.getElementById('modLevelVictors').value.trim();
 if (victorsRaw) {
 try { victorsParsed = JSON.parse(victorsRaw); }
-catch(err) { alert("Invalid syntax schema format found inside victors mapping array parameter configuration block."); return; }
+catch(err) { alert("Invalid syntax format inside victors data mapping array."); return; }
 }
 const body = {
 id: editId || "lvl-" + Date.now(),
@@ -420,10 +370,10 @@ await saveData();
 document.getElementById('levelMutationForm').reset();
 document.getElementById('editLevelId').value = '';
 loadData();
-alert("Database mutation applied across cloud system servers.");
+alert("Database entry mutations applied to servers!");
 }
 async function deleteLevel(id) {
-if (confirm("Permanently wipe this entry profile off all global systems grids?")) {
+if (confirm("Permanently wipe this entry row off the grid network?")) {
 dbData.levels = dbData.levels.filter(l => l.id !== id);
 await saveData();
 loadData();
@@ -457,7 +407,7 @@ q.innerHTML = <p class="text-xs text-slate-500 italic text-center py-8">Audit qu
 } else {
 dbData.pendingSubmissions.forEach(s => {
 const lvl = dbData.levels.find(l => l.id === s.levelId);
-q.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800 text-xs"> <div class="flex justify-between mb-2"> <span><b>${s.playerName}</b> checked on <i>${lvl ? lvl.name : 'Unknown'}</i></span> <a href="${s.videoUrl}" target="_blank" class="text-blue-400 hover:underline">Watch Run</a> </div> <div class="flex gap-2"> <button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-1 rounded font-bold text-[10px] text-white hover:bg-emerald-500">Approve</button> <button onclick="rejectRecord('${s.id}')" class="bg-slate-800 text-slate-400 px-2 py-1 rounded text-[10px] hover:text-white">Deny</button> </div> </div>;
+q.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800 text-xs"> <div class="flex justify-between mb-2"> <span><b>${s.playerName}</b> beat <i>${lvl ? lvl.name : 'Unknown'}</i></span> <a href="${s.videoUrl}" target="_blank" class="text-blue-400 hover:underline">Watch Run</a> </div> <div class="flex gap-2"> <button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-1 rounded font-bold text-[10px] text-white">Approve</button> <button onclick="rejectRecord('${s.id}')" class="bg-slate-800 text-slate-400 px-2 py-1 rounded text-[10px]">Deny</button> </div> </div>;
 });
 }
 }
@@ -487,13 +437,12 @@ document.getElementById('modLevelDesc').value = l.description || '';
 document.getElementById('modLevelVictors').value = JSON.stringify(l.victors || []);
 }
 function verifyModPassword() {
-// CHECK SECURE TOKEN VERIFICATION MATCH SYSTEM RULE
 if (document.getElementById('modPasswordInput').value === 'MHSDL#42') {
 isModAuthenticated = true;
 document.getElementById('modAuthView').classList.add('hidden');
 document.getElementById('modDashboardView').classList.remove('hidden');
 renderModPanel();
-} else { alert('Access Denied. Passphrase mismatch tokens profiles.'); }
+} else { alert('Access Denied. Passphrase token invalid.'); }
 }
 function lockModPanel() {
 isModAuthenticated = false;
