@@ -151,273 +151,214 @@
   </footer>
 
   <script>
-// ==========================================
-// 🌐 GLOBAL CLOUD DATABASE CONFIGURATION
-// ==========================================
-// We use JSONbin's completely free public bin system.
-// This allows saving data dynamically from GitHub Pages without requiring an account.
-const CLOUD_DB_URL = 'https://api.jsonbin.io/v3/b/6add7362ffd5d1605389788f';
-
-// Application System State
+const CLOUD_DB_URL = 'jsonbin.io';
 let dbData = { levels: [], pendingSubmissions: [] };
 let currentTab = 'lists';
 let currentSubList = 'pemonlist';
 let isModAuthenticated = false;
 let searchQuery = '';
-
-// ==========================================
-// 💾 LIVE NETWORK SYNCHRONISATION ENGINES
-// ==========================================
+// Independent UI Switching Logic Engine Loops (Safe From Empty State Data Dependencies)
+function switchTab(tabId) {
+currentTab = tabId;
+document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+const targetSec = document.getElementById(section-${tabId});
+if (targetSec) targetSec.classList.remove('hidden');
+document.querySelectorAll('#mainNavTabs button').forEach(b => {
+b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all";
+});
+const activeBtn = document.getElementById(tabBtn-${tabId});
+if (activeBtn) activeBtn.className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white transition-all";
+}
+function switchSubList(subListId) {
+currentSubList = subListId;
+document.querySelectorAll('#subListTabRow button').forEach(b => {
+b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50 transition-all";
+});
+const activeBtn = document.getElementById(subListBtn-${subListId});
+if (activeBtn) activeBtn.className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700 transition-all";
+renderLevelList();
+}
+// Network Sync Blocks
 async function loadData() {
-  try {
-    const response = await fetch(CLOUD_DB_URL);
-    if (response.ok) {
-      dbData = await response.json();
-      console.log("Cloud Database synchronized successfully!");
-    } else {
-      console.warn("Initializing clean state configuration...");
-    }
-    renderAll();
-  } catch (err) {
-    console.error("Failed to connect to the cloud database server:", err);
-    renderAll();
-  }
+try {
+const res = await fetch(CLOUD_DB_URL);
+if (res.ok) {
+const rawData = await res.json();
+if (rawData) {
+dbData.levels = rawData.levels || [];
+dbData.pendingSubmissions = rawData.pendingSubmissions || [];
 }
-
+}
+renderAll();
+} catch (err) {
+console.error("Database initialization fault, keeping state isolated context profiles:", err);
+renderAll();
+}
+}
 async function saveData() {
-  try {
-    await fetch(CLOUD_DB_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dbData)
-    });
-  } catch (err) {
-    console.error("Network upload failure. Changes could not be synced globally:", err);
-  }
+try {
+await fetch(CLOUD_DB_URL, {
+method: 'PUT',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(dbData)
+});
+} catch (err) {
+console.error("Failed to commit changes out to the network stream channel node:", err);
 }
-
-// ==========================================
-// 📊 SCORE ENGINEERING & LEADERBOARD SYSTEM
-// ==========================================
+}
+// Mathematical Rules
 function calculateLevelScore(level) {
-  if (level.scoreOverride) return parseFloat(level.scoreOverride);
-  const r = parseInt(level.rank) || 1;
-  
-  if (level.tier === 'pemonlist') return Math.max(600 - (r - 1) * 25, 100);
-  
-  if (level.tier === 'classic') {
-    let score = 500;
-    for (let i = 1; i < r; i++) {
-      if (score > 400) {
-        score -= 20;
-      } else {
-        score -= 3;
-      }
-    }
-    return Math.max(score, 5);
-  }
-  
-  if (level.tier === 'legacy') return Math.max(50 - (r - 1) * 2, 5);
-  if (level.tier === 'challenge') return Math.max(150 - (r - 1) * 10, 10);
-  return 0;
+if (level.scoreOverride) return parseFloat(level.scoreOverride);
+const r = parseInt(level.rank) || 1;
+if (level.tier === 'pemonlist') return Math.max(600 - (r - 1) * 25, 100);
+if (level.tier === 'classic') {
+let score = 500;
+for (let i = 1; i < r; i++) { score > 400 ? score -= 20 : score -= 3; }
+return Math.max(score, 5);
 }
-
+if (level.tier === 'legacy') return Math.max(50 - (r - 1) * 2, 5);
+if (level.tier === 'challenge') return Math.max(150 - (r - 1) * 10, 10);
+return 0;
+}
 function getLeaderboard() {
-  let playerMap = {};
-  if (dbData && dbData.levels) {
-    dbData.levels.forEach(lvl => {
-      const points = calculateLevelScore(lvl);
-      if (lvl.victors) {
-        lvl.victors.forEach(v => {
-          const pName = v.name.trim();
-          if (!playerMap[pName]) playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
-          playerMap[pName].totalPoints += points;
-          playerMap[pName].completions.push({
-            levelName: lvl.name,
-            tier: lvl.tier,
-            rank: lvl.rank,
-            pointsEarned: points,
-            proof: v.proof
-          });
-        });
-      }
-    });
-  }
-  return Object.values(playerMap).sort((a, b) => b.totalPoints - a.totalPoints);
+let playerMap = {};
+if (dbData.levels && Array.isArray(dbData.levels)) {
+dbData.levels.forEach(lvl => {
+const points = calculateLevelScore(lvl);
+if (lvl.victors && Array.isArray(lvl.victors)) {
+lvl.victors.forEach(v => {
+if (!v.name) return;
+const pName = v.name.trim();
+if (!playerMap[pName]) playerMap[pName] = { name: pName, totalPoints: 0, completions: [] };
+playerMap[pName].totalPoints += points;
+playerMap[pName].completions.push({ levelName: lvl.name, tier: lvl.tier, rank: lvl.rank, pointsEarned: points, proof: v.proof || "#" });
+});
 }
-
-// ==========================================
-// 🖥️ UI INTERFACE RENDERING ENGINE
-// ==========================================
-function renderAll() {
-  renderLevelList();
-  renderLeaderboard();
-  renderSubmissionSelect();
-  renderModPanel();
+});
 }
-
+return Object.values(playerMap).sort((a,b) => b.totalPoints - a.totalPoints);
+}
+// Dynamic Level Lists Matrix Outputs
 function renderLevelList() {
-  const container = document.getElementById('levelListContainer');
-  if (!container) return;
-  container.innerHTML = '';
-  
-  if (!dbData || !dbData.levels) return;
-  
-  let filtered = dbData.levels.filter(l => l.tier === currentSubList);
-  if (searchQuery) {
-    filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) || l.creator.toLowerCase().includes(searchQuery));
-  } else {
-    filtered.sort((a, b) => a.rank - b.rank);
-  }
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800 rounded-xl">No active levels found in this category.</div>`;
-    return;
-  }
-
-  filtered.forEach(lvl => {
-    const card = document.createElement('div');
-    card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-slate-700 shadow-md transition-all";
-    card.onclick = () => openLevelDrawer(lvl.id);
-    card.innerHTML = `
-      <div>
-        <span class="text-slate-500 font-bold mr-2">#${lvl.rank}</span>
-        <span class="text-white font-bold">${lvl.name}</span>
-        <p class="text-xs text-slate-400">by ${lvl.creator}</p>
-      </div>
-      <div class="text-right">
-        <span class="text-xs font-black text-red-500">${calculateLevelScore(lvl).toFixed(0)} Pts</span>
-      </div>
-    `;
-    container.appendChild(card);
-  });
+const container = document.getElementById('levelListContainer');
+if (!container) return;
+container.innerHTML = '';
+if (!dbData.levels || !Array.isArray(dbData.levels)) return;
+let filtered = dbData.levels.filter(l => l.tier === currentSubList);
+if (searchQuery) {
+filtered = dbData.levels.filter(l => l.name.toLowerCase().includes(searchQuery) || l.creator.toLowerCase().includes(searchQuery));
+} else {
+filtered.sort((a,b) => a.rank - b.rank);
 }
-
+if (filtered.length === 0) {
+container.innerHTML = <div class="text-center py-12 text-xs text-slate-500 bg-slate-900/10 border border-slate-800 rounded-xl">No entries live inside this category segment.</div>;
+return;
+}
+filtered.forEach(lvl => {
+const card = document.createElement('div');
+card.className = "bg-slate-900 border border-slate-800 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:border-slate-700 shadow-md transition-all";
+card.onclick = () => openLevelDrawer(lvl.id);
+card.innerHTML = <div><span class="text-slate-500 font-bold mr-2">#${lvl.rank}</span><span class="text-white font-bold">${lvl.name}</span><p class="text-xs text-slate-400">by ${lvl.creator}</p></div><div class="text-right"><span class="text-xs font-black text-red-500">${calculateLevelScore(lvl).toFixed(0)} Pts</span></div>;
+container.appendChild(card);
+});
+}
 function renderLeaderboard() {
-  const tbody = document.getElementById('leaderboardTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  
-  getLeaderboard().forEach((p, i) => {
-    const tr = document.createElement('tr');
-    tr.className = "cursor-pointer hover:bg-slate-850/40 border-b border-slate-900 transition-colors";
-    tr.onclick = () => openPlayerDrawer(p.name);
-    tr.innerHTML = `
-      <td class="p-3 text-slate-400 font-bold">#${i+1}</td>
-      <td class="p-3 text-white font-semibold hover:text-red-400">${p.name}</td>
-      <td class="p-3 text-right text-emerald-400 font-bold">${p.totalPoints.toFixed(1)}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+const tbody = document.getElementById('leaderboardTableBody');
+if (!tbody) return;
+tbody.innerHTML = '';
+const ranks = getLeaderboard();
+if (ranks.length === 0) {
+tbody.innerHTML = <tr><td colspan="3" class="p-4 text-center text-xs text-slate-500">Leaderboard index registry completely clear.</td></tr>;
+return;
 }
-
+ranks.forEach((p, i) => {
+const tr = document.createElement('tr');
+tr.className = "cursor-pointer hover:bg-slate-850/40 border-b border-slate-900/40 transition-colors";
+tr.onclick = () => openPlayerDrawer(p.name);
+tr.innerHTML = <td class="p-3 text-slate-400 font-bold">#${i+1}</td><td class="p-3 text-white font-semibold">${p.name}</td><td class="p-3 text-right text-emerald-400 font-bold">${p.totalPoints.toFixed(1)}</td>;
+tbody.appendChild(tr);
+});
+}
 function renderSubmissionSelect() {
-  const select = document.getElementById('submitTargetLevel');
-  if (!select) return;
-  select.innerHTML = '';
-  if (dbData && dbData.levels) {
-    dbData.levels.forEach(l => {
-      select.innerHTML += `<option value="${l.id}">${l.name} (${l.tier.toUpperCase()} #${l.rank})</option>`;
-    });
-  }
+const select = document.getElementById('submitTargetLevel');
+if (!select) return;
+select.innerHTML = '';
+if (dbData.levels && Array.isArray(dbData.levels)) {
+dbData.levels.sort((a,b)=>a.name.localeCompare(b.name)).forEach(l => {
+select.innerHTML += <option value="${l.id}">${l.name} (${l.tier.toUpperCase()} #${l.rank})</option>;
+});
 }
-
-// ==========================================
-// 📂 INTERACTIVE SIDE SLIDEOUT DRAWERS
-// ==========================================
+}
+// Drawer Inspector Toggles
 function openLevelDrawer(id) {
-  const lvl = dbData.levels.find(l => l.id === id);
-  if (!lvl) return;
-  
-  document.getElementById('drawerDefaultState').classList.add('hidden');
-  document.getElementById('drawerPlayerState').classList.add('hidden');
-  document.getElementById('drawerLevelState').classList.remove('hidden');
-  
-  document.getElementById('lvlDrawerName').innerText = lvl.name;
-  document.getElementById('lvlDrawerRank').innerText = `#${lvl.rank}`;
-  document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
-  document.getElementById('lvlDrawerTier').innerText = lvl.tier;
-  document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No description provided.";
-  document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
-  
-  const list = document.getElementById('lvlDrawerVictorsList');
-  list.innerHTML = '';
-  if (lvl.victors && lvl.victors.length > 0) {
-    document.getElementById('lvlDrawerVictorsCount').innerText = `${lvl.victors.length} runs`;
-    lvl.victors.forEach(v => {
-      list.innerHTML += `
-        <a href="${v.proof}" target="_blank" class="block bg-slate-950 p-2.5 rounded border border-slate-800 text-xs text-slate-300 hover:text-red-400 flex justify-between items-center transition-all">
-          <span><i class="fa-solid fa-user-check mr-2 text-slate-500"></i>${v.name}</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-        </a>`;
-    });
-  } else {
-    document.getElementById('lvlDrawerVictorsCount').innerText = "0 runs";
-    list.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-2">No victors yet.</p>`;
-  }
+const lvl = dbData.levels.find(l => l.id === id);
+if (!lvl) return;
+document.getElementById('drawerDefaultState').classList.add('hidden');
+document.getElementById('drawerPlayerState').classList.add('hidden');
+document.getElementById('drawerLevelState').classList.remove('hidden');
+document.getElementById('lvlDrawerName').innerText = lvl.name;
+document.getElementById('lvlDrawerRank').innerText = #${lvl.rank};
+document.getElementById('lvlDrawerCreator').innerText = lvl.creator;
+document.getElementById('lvlDrawerTier').innerText = lvl.tier;
+document.getElementById('lvlDrawerPoints').innerText = ${calculateLevelScore(lvl).toFixed(0)} PTS;
+document.getElementById('lvlDrawerDesc').innerText = lvl.description || "No specific brief documentation summary recorded.";
+document.getElementById('lvlDrawerVideoBtn').href = lvl.video || "#";
+const list = document.getElementById('lvlDrawerVictorsList');
+list.innerHTML = '';
+if (lvl.victors && lvl.victors.length > 0) {
+document.getElementById('lvlDrawerVictorsCount').innerText = ${lvl.victors.length} completions;
+lvl.victors.forEach(v => {
+list.innerHTML +=  <a href="${v.proof || '#'}" target="_blank" class="flex justify-between items-center bg-slate-950 p-2.5 rounded border border-slate-800 text-xs text-slate-300 hover:text-red-400 transition-all"> <span><i class="fa-solid fa-user-check mr-2 text-slate-600"></i>${v.name}</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> </a>;
+});
+} else {
+document.getElementById('lvlDrawerVictorsCount').innerText = "0 runs";
+list.innerHTML = <p class="text-xs text-slate-500 italic text-center py-2">No completions logged.</p>;
 }
-
+}
 function openPlayerDrawer(name) {
-  const p = getLeaderboard().find(pl => pl.name === name);
-  if (!p) return;
-  
-  document.getElementById('drawerDefaultState').classList.add('hidden');
-  document.getElementById('drawerLevelState').classList.add('hidden');
-  document.getElementById('drawerPlayerState').classList.remove('hidden');
-  
-  document.getElementById('plrDrawerName').innerText = p.name;
-  document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
-  
-  const list = document.getElementById('plrDrawerCompletionsList');
-  list.innerHTML = '';
-  p.completions.forEach(c => {
-    list.innerHTML += `
-      <div class="bg-slate-950 p-3 rounded border border-slate-800/60 text-xs">
-        <div class="flex justify-between font-bold text-white">
-          <span>${c.levelName}</span>
-          <span class="text-emerald-400">+${c.pointsEarned.toFixed(0)}</span>
-        </div>
-        <span class="text-[10px] text-slate-500 uppercase">${c.tier} Position #${c.rank}</span>
-      </div>`;
-  });
+const p = getLeaderboard().find(pl => pl.name === name);
+if (!p) return;
+document.getElementById('drawerDefaultState').classList.add('hidden');
+document.getElementById('drawerLevelState').classList.add('hidden');
+document.getElementById('drawerPlayerState').classList.remove('hidden');
+document.getElementById('plrDrawerName').innerText = p.name;
+document.getElementById('plrDrawerPoints').innerText = p.totalPoints.toFixed(1);
+const list = document.getElementById('plrDrawerCompletionsList');
+list.innerHTML = '';
+p.completions.sort((a,b)=>b.pointsEarned - a.pointsEarned).forEach(c => {
+list.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800/80 text-xs"> <div class="flex justify-between font-bold text-white mb-0.5"> <span>${c.levelName}</span> <span class="text-emerald-400 font-mono">+${c.pointsEarned.toFixed(0)}</span> </div> <span class="text-[10px] text-slate-500 uppercase font-medium">${c.tier} Position Rank #${c.rank}</span> </div>;
+});
 }
-
-// ==========================================
-// 🛡️ STAFF OPERATIONS & VERIFICATION FORMS
-// ==========================================
+// Submission Actions
 async function handleRecordSubmit(e) {
-  e.preventDefault();
-  if (!dbData.pendingSubmissions) dbData.pendingSubmissions = [];
-  dbData.pendingSubmissions.push({
-    id: "sub-" + Date.now(),
-    playerName: document.getElementById('submitPlayerName').value.trim(),
-    levelId: document.getElementById('submitTargetLevel').value,
-    videoUrl: document.getElementById('submitVideoUrl').value.trim()
-  });
-  
-  await saveData();
-  alert('Record submitted to the cloud review queue.');
-  document.getElementById('recordSubmissionForm').reset();
-  loadData();
+e.preventDefault();
+if (!dbData.pendingSubmissions) dbData.pendingSubmissions = [];
+dbData.pendingSubmissions.push({
+id: "sub-" + Date.now(),
+playerName: document.getElementById('submitPlayerName').value.trim(),
+levelId: document.getElementById('submitTargetLevel').value,
+videoUrl: document.getElementById('submitVideoUrl').value.trim()
+});
+await saveData();
+alert('Record run sent into the cloud verification audit loop queue!');
+document.getElementById('recordSubmissionForm').reset();
+loadData();
 }
-
 async function handleLevelMutation(e) {
-  e.preventDefault();
-  const editId = document.getElementById('editLevelId').value;
-  
-  let victorsParsed = [];
-  const victorsRaw = document.getElementById('modLevelVictors').value.trim();
-  if (victorsRaw) {
-    try { victorsParsed = JSON.parse(victorsRaw); } 
-    catch(err) { alert("Invalid JSON formatting syntax in victors field."); return; }
-  }
-
-  const body = {
-    id: editId || "lvl-" + Date.now(),
-    name: document.getElementById('modLevelName').value.trim(),
-    creator: document.getElementById('modLevelCreator').value.trim(),
-    tier: document.getElementById('modLevelTier').value,
-    rank: parseInt(document.getElementById('modLevelRank').value) || 1,
+e.preventDefault();
+const editId = document.getElementById('editLevelId').value;
+let victorsParsed = [];
+const victorsRaw = document.getElementById('modLevelVictors').value.trim();
+if (victorsRaw) {
+try { victorsParsed = JSON.parse(victorsRaw); }
+catch(err) { alert("Invalid syntax schema format found inside victors mapping array parameter configuration block."); return; }
+}
+const body = {
+id: editId || "lvl-" + Date.now(),
+name: document.getElementById('modLevelName').value.trim(),
+creator: document.getElementById('modLevelCreator').value.trim(),
+tier: document.getElementById('modLevelTier').value,
+rank: parseInt(document.getElementById('modLevelRank').value) || 1,
 scoreOverride: document.getElementById('modLevelScoreOverride').value ? parseFloat(document.getElementById('modLevelScoreOverride').value) : null,
 video: document.getElementById('modLevelVideo').value.trim(),
 description: document.getElementById('modLevelDesc').value.trim(),
@@ -434,10 +375,10 @@ await saveData();
 document.getElementById('levelMutationForm').reset();
 document.getElementById('editLevelId').value = '';
 loadData();
-alert("Cloud Database updated successfully!");
+alert("Database mutation applied across cloud system servers.");
 }
 async function deleteLevel(id) {
-if (confirm("Permanently wipe this level entry from the cloud database?")) {
+if (confirm("Permanently wipe this entry profile off all global systems grids?")) {
 dbData.levels = dbData.levels.filter(l => l.id !== id);
 await saveData();
 loadData();
@@ -467,11 +408,11 @@ const q = document.getElementById('approvalsQueueContainer');
 if (q) {
 q.innerHTML = '';
 if (!dbData.pendingSubmissions || dbData.pendingSubmissions.length === 0) {
-q.innerHTML = <p class="text-xs text-slate-500 italic text-center py-8">No records pending audit.</p>;
+q.innerHTML = <p class="text-xs text-slate-500 italic text-center py-8">Audit queue is currently completely clear.</p>;
 } else {
 dbData.pendingSubmissions.forEach(s => {
 const lvl = dbData.levels.find(l => l.id === s.levelId);
-q.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800 text-xs"> <div class="flex justify-between mb-2"> <span><b>${s.playerName}</b> verified on <i>${lvl ? lvl.name : 'Unknown'}</i></span> <a href="${s.videoUrl}" target="_blank" class="text-blue-400 hover:underline">Link</a> </div> <div class="flex gap-2"> <button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-1 rounded font-bold text-[10px] text-white">Approve</button> <button onclick="rejectRecord('${s.id}')" class="bg-slate-800 px-2 py-1 rounded text-[10px] text-slate-400">Deny</button> </div> </div>;
+q.innerHTML +=  <div class="bg-slate-950 p-3 rounded border border-slate-800 text-xs"> <div class="flex justify-between mb-2"> <span><b>${s.playerName}</b> checked on <i>${lvl ? lvl.name : 'Unknown'}</i></span> <a href="${s.videoUrl}" target="_blank" class="text-blue-400 hover:underline">Watch Run</a> </div> <div class="flex gap-2"> <button onclick="approveRecord('${s.id}')" class="bg-emerald-600 px-2 py-1 rounded font-bold text-[10px] text-white hover:bg-emerald-500">Approve</button> <button onclick="rejectRecord('${s.id}')" class="bg-slate-800 text-slate-400 px-2 py-1 rounded text-[10px] hover:text-white">Deny</button> </div> </div>;
 });
 }
 }
@@ -501,12 +442,13 @@ document.getElementById('modLevelDesc').value = l.description || '';
 document.getElementById('modLevelVictors').value = JSON.stringify(l.victors || []);
 }
 function verifyModPassword() {
+// CHECK SECURE TOKEN VERIFICATION MATCH SYSTEM RULE
 if (document.getElementById('modPasswordInput').value === 'MHSDL#42') {
 isModAuthenticated = true;
 document.getElementById('modAuthView').classList.add('hidden');
 document.getElementById('modDashboardView').classList.remove('hidden');
 renderModPanel();
-} else { alert('Access Token Invalid'); }
+} else { alert('Access Denied. Passphrase mismatch tokens profiles.'); }
 }
 function lockModPanel() {
 isModAuthenticated = false;
@@ -514,20 +456,8 @@ document.getElementById('modAuthView').classList.remove('hidden');
 document.getElementById('modDashboardView').classList.add('hidden');
 document.getElementById('modPasswordInput').value = '';
 }
-function switchTab(t) {
-currentTab = t;
-document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-document.getElementById(section-${t}).classList.remove('hidden');
-document.querySelectorAll('nav button').forEach(b => b.className = "px-4 py-1.5 text-sm font-medium rounded-lg text-slate-400 hover:text-white");
-document.getElementById(tabBtn-${t}).className = "px-4 py-1.5 text-sm font-medium rounded-lg bg-red-600 text-white";
-}
-function switchSubList(s) {
-currentSubList = s;
-document.querySelectorAll('[id^="subListBtn-"]').forEach(b => b.className = "px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800/50");
-document.getElementById(subListBtn-${s}).className = "px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-white border border-slate-700";
-renderLevelList();
-}
-function handleSearch(v) { searchQuery = v.toLowerCase().trim(); renderLevelList(); }
+function handleSearch(v) { searchQuery = v.toLowerCase().trim(); renderLevelList(); renderLeaderboard(); }
+function renderAll() { renderLevelList(); renderLeaderboard(); renderSubmissionSelect(); renderModPanel(); }
 document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
